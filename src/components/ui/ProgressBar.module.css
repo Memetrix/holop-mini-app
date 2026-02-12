@@ -1,0 +1,73 @@
+.wrapper {
+  width: 100%;
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--parchment);
+  font-variant-numeric: tabular-nums;
+}
+
+.track {
+  width: 100%;
+  background: rgba(200, 151, 62, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 300ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  position: relative;
+}
+
+.fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), transparent);
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+}
+
+.gold {
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
+}
+
+.health {
+  background: linear-gradient(90deg, #388E3C, #4CAF50, #66BB6A);
+}
+
+.xp {
+  background: linear-gradient(90deg, #1565C0, #2196F3, #42A5F5);
+}
+
+.danger {
+  background: linear-gradient(90deg, #C62828, #E53935, #EF5350);
+}
+
+.dangerPulse {
+  animation: dangerPulse 1s ease infinite;
+}
+
+@keyframes dangerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}

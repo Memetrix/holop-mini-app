@@ -1,0 +1,156 @@
+.titleCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.titleHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.titleIcon {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.titleInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.titleName {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--gold-light);
+}
+
+.nextTitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.incomeTag {
+  background: rgba(200, 151, 62, 0.12);
+  border: 1px solid rgba(200, 151, 62, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+}
+
+.incomeValue {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--space-5) 0 var(--space-3);
+}
+
+.sectionTitle h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--gold-light);
+}
+
+.buildingCount {
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+}
+
+.buildingList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+}
+
+.buildingCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  transition: all var(--transition-fast);
+}
+
+.buildingCard:active {
+  transform: scale(0.98);
+  border-color: var(--border-active);
+}
+
+.buildingImg {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.buildingInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.buildingName {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--parchment);
+}
+
+.buildingLevel {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+.buildingIncome {
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.buildingAction {
+  flex-shrink: 0;
+}
+
+.maxLevel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+  background: rgba(200, 151, 62, 0.15);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cooldown {
+  font-size: 12px;
+  color: var(--warning);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}

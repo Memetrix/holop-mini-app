@@ -1,0 +1,255 @@
+/* ========================================
+   HOLOP TMA — Global Styles
+   Apple HIG 26 + HOLOP Brand
+   ======================================== */
+
+/* CSS Custom Properties (HOLOP Brand) */
+:root {
+  /* Gold palette */
+  --gold: #C8973E;
+  --gold-light: #E8C77B;
+  --gold-dark: #8B6914;
+  --gold-muted: rgba(200, 151, 62, 0.6);
+
+  /* Background palette */
+  --bg-dark: #1A1008;
+  --bg-card: #231A0E;
+  --bg-card-hover: #2D2114;
+  --bg-elevated: #2A1F12;
+  --bg-modal: rgba(26, 16, 8, 0.95);
+
+  /* Text palette */
+  --parchment: #F5ECD7;
+  --parchment-dark: #E8D9B8;
+  --ink: #2C1810;
+  --text-muted: rgba(245, 236, 215, 0.5);
+  --text-secondary: rgba(245, 236, 215, 0.7);
+
+  /* Borders & effects */
+  --border: rgba(200, 151, 62, 0.15);
+  --border-active: rgba(200, 151, 62, 0.4);
+  --glow: rgba(200, 151, 62, 0.06);
+  --glow-strong: rgba(200, 151, 62, 0.15);
+  --shadow: rgba(0, 0, 0, 0.4);
+
+  /* Semantic colors */
+  --success: #4CAF50;
+  --danger: #E53935;
+  --warning: #FF9800;
+  --info: #2196F3;
+
+  /* Liquid Glass (Apple HIG 26) */
+  --glass-bg: rgba(35, 26, 14, 0.72);
+  --glass-border: rgba(200, 151, 62, 0.12);
+  --glass-blur: 20px;
+  --glass-saturate: 1.8;
+
+  /* Typography */
+  --font-display: 'Neucha', cursive;
+  --font-heading: 'Cormorant Garamond', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Spacing scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Sizes */
+  --touch-target: 44px; /* Apple HIG 26 minimum */
+  --tab-bar-height: 84px;
+  --top-bar-height: 56px;
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* Z-index scale */
+  --z-base: 0;
+  --z-card: 10;
+  --z-sticky: 50;
+  --z-overlay: 100;
+  --z-modal: 200;
+  --z-toast: 300;
+  --z-tooltip: 400;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-normal: 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-slow: 400ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --spring: 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Reset */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  overflow: hidden;
+  height: 100%;
+  height: 100dvh;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--parchment);
+  background-color: var(--bg-dark);
+  min-height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#root {
+  min-height: 100%;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--gold-light);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+h1 { font-size: 28px; }
+h2 { font-size: 24px; }
+h3 { font-size: 20px; }
+h4 { font-size: 17px; font-family: var(--font-heading); font-weight: 600; }
+h5 { font-size: 15px; font-family: var(--font-heading); font-weight: 600; }
+
+p {
+  color: var(--parchment-dark);
+  line-height: 1.6;
+}
+
+/* Links */
+a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+/* Images */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Button reset */
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  outline: none;
+  min-height: var(--touch-target);
+  min-width: var(--touch-target);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold-dark);
+  border-radius: var(--radius-full);
+}
+
+/* Utility: Glass effect (Apple HIG 26 Liquid Glass) */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+}
+
+/* Utility: Gold gradient text */
+.text-gold {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Utility: card base */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  transition: all var(--transition-fast);
+}
+
+.card:active {
+  transform: scale(0.98);
+  border-color: var(--border-active);
+  box-shadow: 0 0 20px var(--glow-strong);
+}
+
+/* Utility: Gold glow on press */
+.glow-press:active {
+  box-shadow: 0 0 24px var(--glow-strong), inset 0 0 12px var(--glow);
+}
+
+/* Utility: hide scrollbar but keep scroll */
+.scroll-hidden {
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Safe areas */
+.safe-top {
+  padding-top: var(--safe-area-top);
+}
+
+.safe-bottom {
+  padding-bottom: var(--safe-area-bottom);
+}

@@ -1,0 +1,75 @@
+.caveSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.caveHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.caveIcon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.caveHeader h3 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--gold-light);
+}
+
+.caveSubtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.monsterList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.monsterCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.monsterImg {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.monsterInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.monsterName {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--parchment);
+  display: block;
+}
+
+.monsterStats {
+  display: flex;
+  gap: var(--space-2);
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 2px 0;
+}

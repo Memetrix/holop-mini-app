@@ -1,0 +1,23 @@
+/* ========================================
+   HOLOP TMA — Font Loading
+   ======================================== */
+
+/* Neucha — Display/Game headings (loaded via Google Fonts link in index.html) */
+/* Cormorant Garamond — Elegant subheadings */
+/* Inter — Body text, UI elements */
+
+/* Font weight reference:
+   Neucha:             400 (only one weight, naturally cursive)
+   Cormorant Garamond: 400, 600, 700
+   Inter:              400, 500, 600, 700
+*/
+
+/* Ensure fonts are loaded before showing content */
+.fonts-loading {
+  opacity: 0;
+}
+
+.fonts-loaded {
+  opacity: 1;
+  transition: opacity 200ms ease;
+}

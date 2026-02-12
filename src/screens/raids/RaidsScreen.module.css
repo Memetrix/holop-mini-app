@@ -1,0 +1,99 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.header h2 {
+  font-family: var(--font-display);
+  color: var(--gold-light);
+}
+
+.locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-10) var(--space-6);
+  gap: var(--space-4);
+}
+
+.lockedIcon {
+  width: 80px;
+  height: 80px;
+  opacity: 0.4;
+  filter: grayscale(0.5);
+}
+
+.locked h2 {
+  font-family: var(--font-display);
+  color: var(--gold-light);
+  font-size: 22px;
+}
+
+.locked p {
+  color: var(--text-muted);
+  font-size: 14px;
+  max-width: 260px;
+}
+
+.targetList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.targetCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.targetInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.targetHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.targetAvatar {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.targetName {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--parchment);
+}
+
+.targetCity {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.targetStats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.stat {
+  font-size: 12px;
+  color: var(--text-secondary);
+}

@@ -1,0 +1,35 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon {
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.amount {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--parchment);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sizes */
+.sm .icon { width: 14px; height: 14px; }
+.sm .amount { font-size: 12px; }
+
+.md .icon { width: 18px; height: 18px; }
+.md .amount { font-size: 14px; }
+
+.lg .icon { width: 24px; height: 24px; }
+.lg .amount { font-size: 18px; }
+
+.positive {
+  color: var(--success);
+}
+
+.negative {
+  color: var(--danger);
+}
