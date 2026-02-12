@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useHaptics } from '@/hooks/useHaptics';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
 import { Button } from '@/components/ui/Button';
+import { ResultEffect } from '@/pixi/ResultEffect';
 import styles from './BattleResultModal.module.css';
 
 interface BattleResultModalProps {
@@ -61,6 +62,7 @@ export function BattleResultModal({
 
         {/* Header */}
         <div className={`${styles.header} ${won ? styles.headerWon : styles.headerLost}`}>
+          <ResultEffect won={won} width={window.innerWidth > 428 ? 428 : window.innerWidth} height={140} />
           <h2 className={styles.title}>
             {won ? 'ПОБЕДА!' : 'ПОРАЖЕНИЕ'}
           </h2>

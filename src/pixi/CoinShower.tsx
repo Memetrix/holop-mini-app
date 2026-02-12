@@ -45,6 +45,10 @@ export function CoinShower({
   const containerRef = useRef<HTMLDivElement>(null);
   const destroyedRef = useRef(false);
 
+  // Store onComplete in a ref to avoid re-mounting PixiJS on every parent render
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
+
   useEffect(() => {
     destroyedRef.current = false;
     const el = containerRef.current;
@@ -157,7 +161,7 @@ export function CoinShower({
         // ── Complete ──
         if (elapsed >= DURATION_MS && !completeCalled) {
           completeCalled = true;
-          onComplete();
+          onCompleteRef.current();
         }
       });
     }
@@ -177,7 +181,7 @@ export function CoinShower({
         }
       }
     };
-  }, [amount, onComplete, width, height]);
+  }, [amount, width, height]);
 
   return (
     <div

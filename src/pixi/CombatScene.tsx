@@ -71,6 +71,13 @@ export function CombatScene({
   const containerRef = useRef<HTMLDivElement>(null);
   const destroyedRef = useRef(false);
 
+  // Store callbacks/values in refs to avoid re-mounting PixiJS on every parent render
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
+
+  const resultRef = useRef(result);
+  useEffect(() => { resultRef.current = result; }, [result]);
+
   useEffect(() => {
     destroyedRef.current = false;
     const container = containerRef.current;
@@ -258,10 +265,11 @@ export function CombatScene({
       pixiApp.stage.addChild(redOverlay);
 
       // ── Result text ──
+      const currentResult = resultRef.current;
       const resultStyle = new TextStyle({
         fontSize: 36,
         fontWeight: 'bold',
-        fill: result.won ? theme.pixi.gold : theme.pixi.danger,
+        fill: currentResult.won ? theme.pixi.gold : theme.pixi.danger,
         stroke: { color: 0x000000, width: 4 },
         dropShadow: {
           color: 0x000000,
@@ -272,7 +280,7 @@ export function CombatScene({
         align: 'center',
       });
       const resultText = new Text({
-        text: result.won ? 'ПОБЕДА!' : 'ПОРАЖЕНИЕ',
+        text: currentResult.won ? 'ПОБЕДА!' : 'ПОРАЖЕНИЕ',
         style: resultStyle,
       });
       resultText.anchor.set(0.5, 0.5);
@@ -284,10 +292,10 @@ export function CombatScene({
 
       // ── Loot text (shown on victory) ──
       let lootText: Text | null = null;
-      if (result.won && (result.silverLooted > 0 || result.goldLooted > 0)) {
+      if (currentResult.won && (currentResult.silverLooted > 0 || currentResult.goldLooted > 0)) {
         const parts: string[] = [];
-        if (result.silverLooted > 0) parts.push(`${result.silverLooted} серебра`);
-        if (result.goldLooted > 0) parts.push(`${result.goldLooted} золота`);
+        if (currentResult.silverLooted > 0) parts.push(`${currentResult.silverLooted} серебра`);
+        if (currentResult.goldLooted > 0) parts.push(`${currentResult.goldLooted} золота`);
         const lootStyle = new TextStyle({
           fontSize: 18,
           fontWeight: 'bold',
@@ -390,7 +398,7 @@ export function CombatScene({
 
         // ── Phase: BATTLE ──
         else if (phase === 'battle') {
-          const log = result.combatLog;
+          const log = currentResult.combatLog;
 
           if (currentRound >= log.length) {
             // All rounds done
@@ -482,7 +490,7 @@ export function CombatScene({
             }
           }
 
-          if (result.won) {
+          if (currentResult.won) {
             // Opponent fades out
             opponentSprite.alpha = lerp(1, 0, easeOutQuad(Math.min(t / 0.6, 1)));
 
@@ -515,7 +523,7 @@ export function CombatScene({
         // ── Phase: DONE ──
         else if (phase === 'done' && !completeCalled) {
           completeCalled = true;
-          onComplete();
+          onCompleteRef.current();
         }
       });
     }
@@ -535,7 +543,7 @@ export function CombatScene({
         }
       }
     };
-  }, [playerAssetKey, opponentAssetKey, result, onComplete, width, height]);
+  }, [playerAssetKey, opponentAssetKey, width, height]);
 
   return (
     <div

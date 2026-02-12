@@ -278,6 +278,10 @@ export function LootboxScene({
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
 
+  // Store onComplete in a ref to avoid re-mounting PixiJS on every parent render
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -497,7 +501,7 @@ export function LootboxScene({
         /* ===== Complete ===== */
         if (elapsed >= PHASE_TOTAL && !completeFired) {
           completeFired = true;
-          onComplete();
+          onCompleteRef.current();
         }
       });
     };
@@ -514,7 +518,7 @@ export function LootboxScene({
         appRef.current = null;
       }
     };
-  }, [width, height, rewards, onComplete]);
+  }, [width, height, rewards]);
 
   return <div ref={containerRef} style={{ width, height, overflow: 'hidden' }} />;
 }
