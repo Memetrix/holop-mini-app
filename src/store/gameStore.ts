@@ -47,7 +47,7 @@ const MOCK_USER: User = {
   ironDomeUntil: null,
   caveCooldownUntil: null,
   raidCooldownUntil: null,
-  lastIncomeCollect: new Date().toISOString(),
+  lastIncomeCollect: new Date(Date.now() - 60 * 60 * 1000).toISOString(), // 1 hour ago for demo
   language: 'ru',
 };
 

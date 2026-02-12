@@ -144,6 +144,7 @@ export function BuildingScene({ width = 375, height = 280 }: BuildingSceneProps)
     const container: HTMLDivElement = containerRef.current;
 
     let destroyed = false;
+    let appInitialized = false;
     const app = new Application();
 
     // Particle arrays
@@ -173,10 +174,11 @@ export function BuildingScene({ width = 375, height = 280 }: BuildingSceneProps)
       });
 
       if (destroyed) {
-        app.destroy(true);
+        try { app.destroy(true); } catch { /* already torn down */ }
         return;
       }
 
+      appInitialized = true;
       container.appendChild(app.canvas);
 
       app.stage.addChild(glowLayer);
@@ -187,7 +189,7 @@ export function BuildingScene({ width = 375, height = 280 }: BuildingSceneProps)
       await loadBuildings();
 
       if (destroyed) {
-        app.destroy(true, { children: true });
+        try { app.destroy(true, { children: true }); } catch { /* already gone */ }
         return;
       }
 
@@ -396,26 +398,29 @@ export function BuildingScene({ width = 375, height = 280 }: BuildingSceneProps)
       }
     }
 
-    setup();
+    setup().catch(() => { /* init aborted */ });
 
     return () => {
       destroyed = true;
 
-      // Clean up particles
+      // Clean up particles safely
       for (const p of coinParticles) {
-        p.gfx.destroy();
+        try { p.gfx.destroy(); } catch { /* already gone */ }
       }
       coinParticles.length = 0;
 
       for (const p of smokeParticles) {
-        p.gfx.destroy();
+        try { p.gfx.destroy(); } catch { /* already gone */ }
       }
       smokeParticles.length = 0;
 
       buildingEntries.length = 0;
 
       // Destroy app and remove canvas
-      app.destroy(true, { children: true });
+      if (appInitialized) {
+        try { app.destroy(true, { children: true }); } catch { /* already gone */ }
+      }
+      // Force-remove any leftover canvas elements
       while (container.firstChild) {
         container.removeChild(container.firstChild);
       }

@@ -34,11 +34,11 @@ export function TerritoryScreen() {
     const lastCollect = new Date(user.lastIncomeCollect).getTime();
     const hoursPassed = (now - lastCollect) / (1000 * 60 * 60);
     const earned = Math.floor(totalIncome * hoursPassed);
-    if (earned > 0) {
-      setCollectedAmount(earned);
-      setShowCoinShower(true);
-    }
     collectIncome();
+    // Always show animation — use earned amount or a minimum visual amount
+    const displayAmount = earned > 0 ? earned : Math.max(1, Math.floor(totalIncome / 60));
+    setCollectedAmount(displayAmount);
+    setShowCoinShower(true);
   };
 
   return (

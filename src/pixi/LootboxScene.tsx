@@ -514,8 +514,14 @@ export function LootboxScene({
       destroyed = true;
       const a = appRef.current;
       if (a) {
-        a.destroy(true, { children: true });
+        try { a.destroy(true, { children: true }); } catch { /* already gone */ }
         appRef.current = null;
+      }
+      // Force-remove any leftover canvas
+      if (el) {
+        while (el.firstChild) {
+          el.removeChild(el.firstChild);
+        }
       }
     };
   }, [width, height, rewards]);

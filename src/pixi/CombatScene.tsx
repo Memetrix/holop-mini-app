@@ -534,7 +534,7 @@ export function CombatScene({
       cancelled = true;
       destroyedRef.current = true;
       if (app) {
-        app.destroy(true, { children: true });
+        try { app.destroy(true, { children: true }); } catch { /* already gone */ }
         app = null;
       }
       if (container) {
