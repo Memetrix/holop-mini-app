@@ -5,7 +5,7 @@
  */
 
 import { useRef, useEffect } from 'react';
-import { Application, Assets, Container, Graphics, Sprite, Rectangle } from 'pixi.js';
+import { Application, Assets, Container, Graphics, Sprite, Rectangle, Texture } from 'pixi.js';
 import { useGameStore } from '@/store/gameStore';
 import { getBuildingById } from '@/config/buildings';
 import { getAssetUrl } from '@/config/assets';
@@ -21,6 +21,9 @@ import {
   seededRandom,
 } from '@/config/cityLayout';
 import { SMOKE_PARTICLE } from './particles';
+import { generateTerrainCanvas, RIVER_SEGMENTS } from './terrainNoise';
+import { createWaterFilter, updateWaterFilter } from './waterShader';
+import type { Filter } from 'pixi.js';
 import type { Building } from '@/store/types';
 import type { BuildingDef } from '@/config/buildings';
 import type { CitySlot } from '@/config/cityLayout';
@@ -205,6 +208,8 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
 
   const buildingsRef = useRef(buildings);
   const onSlotTapRef = useRef(onSlotTap);
+  // Persist camera position across scene rebuilds (e.g. when building is constructed)
+  const cameraRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => { buildingsRef.current = buildings; }, [buildings]);
   useEffect(() => { onSlotTapRef.current = onSlotTap; }, [onSlotTap]);
@@ -235,6 +240,9 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
     const particleLayer = new Container();
     const uiIconLayer = new Container();
 
+    // Water shader filter (applied to river container)
+    let waterFilter: Filter | null = null;
+
     // Pan state (closure variables for 60fps)
     let isDragging = false;
     let lastPointerX = 0;
@@ -244,9 +252,9 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
     let dragDistance = 0;
     let dragStartTime = 0;
 
-    // Initial camera position — center horizontally, show top islands below HUD
-    let worldX = -(WORLD_WIDTH / 2 - width / 2);
-    let worldY = 80;
+    // Initial camera position — restore previous position or center horizontally
+    let worldX = cameraRef.current?.x ?? -(WORLD_WIDTH / 2 - width / 2);
+    let worldY = cameraRef.current?.y ?? 80;
 
     // Plus icon references for pulsing
     const plusIcons: { gfx: Graphics; slot: CitySlot }[] = [];
@@ -369,6 +377,9 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
           worldContainer.y = worldY;
         }
 
+        // Animated water shader
+        if (waterFilter) updateWaterFilter(waterFilter, dt);
+
         // Building animations
         updateBuildingAnimations(time);
 
@@ -408,61 +419,38 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
     }
 
     function drawTerrain() {
-      // ─── 1. Ground base ───
-      const bg = new Graphics();
-      bg.rect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-      bg.fill({ color: 0x1A120A });
-      backgroundLayer.addChild(bg);
+      // ─── 1. Noise-generated terrain texture (computed once) ───
+      const terrainCanvas = generateTerrainCanvas();
+      const terrainTexture = Texture.from(terrainCanvas);
+      const terrainSprite = new Sprite(terrainTexture);
+      backgroundLayer.addChild(terrainSprite);
 
-      // ─── 2. Large terrain patches (fields, forests, marshes) ───
-      const patches = new Graphics();
-      const patchData = [
-        // Fields (lighter earth / plowed)
-        { cx: 120, cy: 250, rx: 140, ry: 90, color: 0x2A1E10, alpha: 0.35, seed: 10 },
-        { cx: 650, cy: 200, rx: 110, ry: 70, color: 0x2A1E10, alpha: 0.30, seed: 20 },
-        { cx: 400, cy: 600, rx: 160, ry: 100, color: 0x251A0D, alpha: 0.25, seed: 30 },
-        { cx: 180, cy: 750, rx: 130, ry: 80, color: 0x2A1E10, alpha: 0.28, seed: 40 },
-        { cx: 700, cy: 750, rx: 120, ry: 95, color: 0x251A0D, alpha: 0.30, seed: 50 },
-        { cx: 350, cy: 950, rx: 170, ry: 110, color: 0x2A1E10, alpha: 0.22, seed: 60 },
-        // Dark forest zones
-        { cx: 80,  cy: 500, rx: 90,  ry: 120, color: 0x1A2B10, alpha: 0.25, seed: 70 },
-        { cx: 800, cy: 400, rx: 85,  ry: 130, color: 0x1A2B10, alpha: 0.22, seed: 80 },
-        { cx: 100, cy: 1000, rx: 95, ry: 100, color: 0x162510, alpha: 0.28, seed: 90 },
-        { cx: 750, cy: 1100, rx: 100, ry: 90,  color: 0x162510, alpha: 0.20, seed: 95 },
-      ];
-      for (const p of patchData) {
-        const pts = generateSmoothBlob(p.cx, p.cy, (p.rx + p.ry) / 2, p.seed, p.ry / p.rx, 0, 10);
-        drawSmoothClosedCurve(patches, pts);
-        patches.fill({ color: p.color, alpha: p.alpha });
-      }
-      backgroundLayer.addChild(patches);
-
-      // ─── 3. River / stream ───
+      // ─── 2. Rivers (bezier curves over noise terrain) ───
       const river = new Graphics();
-      // Main river flowing from top-left to bottom-right
-      river.moveTo(0, 380);
-      river.bezierCurveTo(120, 350, 200, 420, 320, 400);
-      river.bezierCurveTo(430, 380, 480, 440, 550, 460);
-      river.bezierCurveTo(650, 490, 750, 470, 900, 520);
-      river.stroke({ color: 0x1A2A3A, width: 18, alpha: 0.18 });
-      // Same path, thinner highlight
-      river.moveTo(0, 380);
-      river.bezierCurveTo(120, 350, 200, 420, 320, 400);
-      river.bezierCurveTo(430, 380, 480, 440, 550, 460);
-      river.bezierCurveTo(650, 490, 750, 470, 900, 520);
-      river.stroke({ color: 0x253545, width: 8, alpha: 0.15 });
-      // Branch stream
-      river.moveTo(320, 400);
-      river.bezierCurveTo(340, 500, 280, 600, 300, 720);
-      river.bezierCurveTo(310, 800, 350, 900, 380, 1000);
-      river.stroke({ color: 0x1A2A3A, width: 10, alpha: 0.14 });
-      river.moveTo(320, 400);
-      river.bezierCurveTo(340, 500, 280, 600, 300, 720);
-      river.bezierCurveTo(310, 800, 350, 900, 380, 1000);
-      river.stroke({ color: 0x253545, width: 4, alpha: 0.12 });
+      for (const seg of RIVER_SEGMENTS) {
+        // Wide dark base
+        river.moveTo(seg.x1, seg.y1);
+        river.bezierCurveTo(seg.cx1, seg.cy1, seg.cx2, seg.cy2, seg.x2, seg.y2);
+        river.stroke({ color: 0x1A2A3A, width: seg.width, alpha: 0.3 });
+        // Brighter center highlight
+        river.moveTo(seg.x1, seg.y1);
+        river.bezierCurveTo(seg.cx1, seg.cy1, seg.cx2, seg.cy2, seg.x2, seg.y2);
+        river.stroke({ color: 0x253848, width: seg.width * 0.45, alpha: 0.25 });
+        // Subtle specular line
+        river.moveTo(seg.x1, seg.y1 - 1);
+        river.bezierCurveTo(seg.cx1, seg.cy1 - 1, seg.cx2, seg.cy2 - 1, seg.x2, seg.y2 - 1);
+        river.stroke({ color: 0x3A5A70, width: 1.5, alpha: 0.12 });
+      }
+      // Apply animated water shader to rivers
+      try {
+        waterFilter = createWaterFilter();
+        river.filters = [waterFilter];
+      } catch {
+        // GLSL shader may not be supported on all devices — fall back to no filter
+      }
       backgroundLayer.addChild(river);
 
-      // ─── 4. Dirt roads between islands (wider, textured) ───
+      // ─── 3. Dirt roads between islands ───
       const roads = new Graphics();
       for (const [a, b] of ISLAND_PATHS) {
         const sa = CITY_SLOTS[a];
@@ -473,91 +461,67 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
         // Road shadow
         roads.moveTo(sa.x, sa.y);
         roads.quadraticCurveTo(mx, my + 2, sb.x, sb.y);
-        roads.stroke({ color: 0x000000, width: 12, alpha: 0.08 });
+        roads.stroke({ color: 0x000000, width: 12, alpha: 0.1 });
         // Road body
         roads.moveTo(sa.x, sa.y);
         roads.quadraticCurveTo(mx, my, sb.x, sb.y);
-        roads.stroke({ color: 0x3A2D1A, width: 8, alpha: 0.35 });
-        // Road edges (lighter)
+        roads.stroke({ color: 0x3A2D1A, width: 8, alpha: 0.45 });
+        // Road lighter edge
         roads.moveTo(sa.x, sa.y);
         roads.quadraticCurveTo(mx, my, sb.x, sb.y);
-        roads.stroke({ color: 0x4A3D2A, width: 10, alpha: 0.08 });
+        roads.stroke({ color: 0x4A3D2A, width: 10, alpha: 0.1 });
       }
       backgroundLayer.addChild(roads);
 
-      // ─── 5. Scattered trees (small groups near forest zones) ───
+      // ─── 4. Scattered trees (avoid islands + roads) ───
       const trees = new Graphics();
       const treeRng = seededRandom(333);
-      for (let i = 0; i < 120; i++) {
+      for (let i = 0; i < 160; i++) {
         const x = treeRng() * WORLD_WIDTH;
         const y = treeRng() * WORLD_HEIGHT;
         // Skip if too close to any island center
         let tooClose = false;
         for (const s of CITY_SLOTS) {
           const dx = x - s.x, dy = y - s.y;
-          if (Math.sqrt(dx * dx + dy * dy) < ISLAND_RADIUS * s.scale + 20) {
+          if (Math.sqrt(dx * dx + dy * dy) < ISLAND_RADIUS * s.scale + 25) {
             tooClose = true;
             break;
           }
         }
         if (tooClose) continue;
-        const size = 3 + treeRng() * 5;
+        const size = 3 + treeRng() * 6;
         const shade = treeRng();
-        // Tree crown
+        // Tree crown (larger, more visible over noise terrain)
         trees.circle(x, y, size);
         trees.fill({
-          color: shade < 0.5 ? 0x1E3012 : 0x2B3B18,
-          alpha: 0.18 + treeRng() * 0.12,
+          color: shade < 0.4 ? 0x1E3012 : shade < 0.7 ? 0x2B3B18 : 0x263516,
+          alpha: 0.3 + treeRng() * 0.15,
         });
-        // Darker center
-        trees.circle(x, y - 1, size * 0.5);
-        trees.fill({ color: 0x142408, alpha: 0.12 });
+        // Darker center dot
+        trees.circle(x, y - 1, size * 0.45);
+        trees.fill({ color: 0x0E1A06, alpha: 0.2 });
+        // Highlight edge
+        if (treeRng() > 0.5) {
+          trees.circle(x + size * 0.3, y - size * 0.3, size * 0.25);
+          trees.fill({ color: 0x3A4D28, alpha: 0.15 });
+        }
       }
       backgroundLayer.addChild(trees);
 
-      // ─── 6. Grass tufts ───
-      const grass = new Graphics();
-      const grassRng = seededRandom(42);
-      for (let i = 0; i < 300; i++) {
-        const x = grassRng() * WORLD_WIDTH;
-        const y = grassRng() * WORLD_HEIGHT;
-        const r = 1 + grassRng() * 2;
-        grass.circle(x, y, r);
-        grass.fill({ color: 0x2D3B1A, alpha: 0.06 + grassRng() * 0.06 });
-      }
-      backgroundLayer.addChild(grass);
-
-      // ─── 7. Field furrow lines (in field patches) ───
-      const furrows = new Graphics();
-      const furrowFields = [
-        { cx: 120, cy: 250, rx: 120, ry: 70 },
-        { cx: 650, cy: 200, rx: 90, ry: 55 },
-        { cx: 400, cy: 600, rx: 130, ry: 80 },
-      ];
-      for (const field of furrowFields) {
-        for (let row = -field.ry + 8; row < field.ry; row += 12) {
-          const startX = field.cx - field.rx * 0.8;
-          const endX = field.cx + field.rx * 0.8;
-          furrows.moveTo(startX, field.cy + row);
-          furrows.lineTo(endX, field.cy + row + 3);
-          furrows.stroke({ color: 0x352810, width: 1, alpha: 0.08 });
-        }
-      }
-      backgroundLayer.addChild(furrows);
-
-      // ─── 8. Subtle fog / atmosphere patches ───
+      // ─── 5. Atmospheric fog patches ───
       const fog = new Graphics();
       const fogPatches = [
-        { x: 200, y: 400, r: 180 },
-        { x: 600, y: 700, r: 200 },
-        { x: 400, y: 1100, r: 160 },
-        { x: 100, y: 900, r: 140 },
-        { x: 750, y: 300, r: 150 },
+        { x: 200, y: 400, r: 200 },
+        { x: 600, y: 700, r: 220 },
+        { x: 400, y: 1100, r: 180 },
+        { x: 100, y: 900, r: 160 },
+        { x: 750, y: 300, r: 170 },
+        { x: 450, y: 200, r: 150 },
       ];
       for (const f of fogPatches) {
-        for (let ring = 3; ring >= 1; ring--) {
-          fog.circle(f.x, f.y, f.r * (ring / 3));
-          fog.fill({ color: 0x1A1A1A, alpha: 0.015 * (1 - ring / 4) });
+        for (let ring = 4; ring >= 1; ring--) {
+          fog.circle(f.x, f.y, f.r * (ring / 4));
+          fog.fill({ color: 0x1A1208, alpha: 0.02 * (1 - ring / 5) });
         }
       }
       backgroundLayer.addChild(fog);
@@ -863,6 +827,10 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
 
     return () => {
       destroyed = true;
+
+      // Save camera position for seamless restore after rebuild
+      cameraRef.current = { x: worldX, y: worldY };
+
       for (const p of coinParticles) { try { p.gfx.destroy(); } catch { /* */ } }
       coinParticles.length = 0;
       for (const p of smokeParticles) { try { p.gfx.destroy(); } catch { /* */ } }
