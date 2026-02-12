@@ -25,8 +25,11 @@
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   border-top: 1px solid var(--glass-border);
   padding: var(--space-4);
-  padding-bottom: calc(var(--space-6) + var(--safe-area-bottom));
+  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
   animation: slideUp 400ms cubic-bezier(0.32, 0.72, 0, 1);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 @keyframes slideUp {
@@ -39,33 +42,50 @@
   height: 4px;
   background: var(--border-active);
   border-radius: var(--radius-full);
-  margin: 0 auto var(--space-4);
+  margin: 0 auto var(--space-3);
 }
 
-.buildingHeader {
+/* ─── Large Building Image ─── */
+.imageSection {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  margin-bottom: var(--space-4);
+  justify-content: center;
+  height: 120px;
+  margin-bottom: var(--space-3);
 }
 
-.buildingImg {
-  width: 72px;
-  height: 72px;
+.imageGlow {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  filter: blur(30px);
+  opacity: 0.4;
+}
+
+.bigImage {
+  width: 100px;
+  height: 100px;
   object-fit: contain;
-  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
 }
 
-.buildingInfo {
-  flex: 1;
+/* ─── Building Info ─── */
+.buildingHeader {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 4px;
+  margin-bottom: var(--space-4);
 }
 
 .buildingName {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 24px;
   color: var(--gold-light);
   line-height: 1.1;
 }
@@ -90,9 +110,10 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 15px;
+  font-size: 16px;
   color: var(--gold);
   font-weight: 600;
+  margin-top: 2px;
 }
 
 .incomeIcon {
@@ -101,6 +122,7 @@
   object-fit: contain;
 }
 
+/* ─── Stats ─── */
 .statsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -129,6 +151,7 @@
   color: var(--parchment);
 }
 
+/* ─── Upgrade Section ─── */
 .upgradeSection {
   display: flex;
   flex-direction: column;
@@ -177,24 +200,4 @@
   color: var(--warning);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
-}
-
-.closeBtn {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  color: var(--text-muted);
-  border-radius: var(--radius-full);
-  min-height: auto;
-  min-width: auto;
-}
-
-.closeBtn:active {
-  background: rgba(255, 255, 255, 0.05);
 }

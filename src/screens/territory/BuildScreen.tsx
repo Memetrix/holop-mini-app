@@ -1,8 +1,12 @@
 /**
  * BuildScreen — Shows available buildings to construct
+ * Renders as portal to avoid clipping by parent container.
+ * Supports swipe-to-close gesture.
  */
+import { createPortal } from 'react-dom';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
+import { useSwipeSheet } from '@/hooks/useSwipeSheet';
 import { getAssetUrl } from '@/config/assets';
 import { BUILDINGS } from '@/config/buildings';
 import { formatNumber } from '@/hooks/useFormatNumber';
@@ -20,6 +24,7 @@ export function BuildScreen({ onClose, targetSlotIndex }: BuildScreenProps) {
   const buildings = useGameStore((s) => s.buildings);
   const buildNewBuilding = useGameStore((s) => s.buildNewBuilding);
   const haptics = useHaptics();
+  const { sheetRef, handlers } = useSwipeSheet({ onClose });
 
   const builtIds = new Set(buildings.map((b) => b.id));
   const availableBuildings = BUILDINGS.filter(
@@ -32,9 +37,14 @@ export function BuildScreen({ onClose, targetSlotIndex }: BuildScreenProps) {
     onClose();
   };
 
-  return (
+  return createPortal(
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={sheetRef}
+        className={styles.sheet}
+        onClick={(e) => e.stopPropagation()}
+        {...handlers}
+      >
         <div className={styles.handle} />
         <div className={styles.header}>
           <h3>Построить здание</h3>
@@ -81,6 +91,7 @@ export function BuildScreen({ onClose, targetSlotIndex }: BuildScreenProps) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

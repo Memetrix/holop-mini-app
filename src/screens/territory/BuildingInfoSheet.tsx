@@ -1,11 +1,14 @@
 /**
  * Building Info & Upgrade Bottom Sheet
  * Shows building details and upgrade option when a building is tapped on the city map.
+ * Supports swipe-to-close gesture.
  */
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
+import { useSwipeSheet } from '@/hooks/useSwipeSheet';
 import { getBuildingById, getBuildingCost, getBuildingIncome } from '@/config/buildings';
 import { getAssetUrl } from '@/config/assets';
 import { getParticleColor } from '@/config/cityLayout';
@@ -30,6 +33,7 @@ export function BuildingInfoSheet({ building, onClose }: BuildingInfoSheetProps)
   const language = useGameStore((s) => s.user.language);
   const haptics = useHaptics();
   const [cooldownText, setCooldownText] = useState('');
+  const { sheetRef, handlers } = useSwipeSheet({ onClose });
 
   const def = getBuildingById(building.id);
   if (!def) return null;
@@ -72,33 +76,41 @@ export function BuildingInfoSheet({ building, onClose }: BuildingInfoSheetProps)
     onClose();
   };
 
-  return (
+  return createPortal(
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={sheetRef}
+        className={styles.sheet}
+        onClick={(e) => e.stopPropagation()}
+        {...handlers}
+      >
         <div className={styles.handle} />
 
-        {/* Building Header */}
-        <div className={styles.buildingHeader}>
+        {/* Large Building Image */}
+        <div className={styles.imageSection}>
+          <div className={styles.imageGlow} style={{ backgroundColor: `${levelColor}20` }} />
           <img
             src={getAssetUrl(def.assetKey)}
             alt={def.nameRu}
-            className={styles.buildingImg}
+            className={styles.bigImage}
           />
-          <div className={styles.buildingInfo}>
-            <div className={styles.buildingName}>
-              {language === 'ru' ? def.nameRu : def.nameEn}
-            </div>
-            <div className={styles.levelBadge}>
-              <span
-                className={styles.levelDot}
-                style={{ backgroundColor: levelColor }}
-              />
-              {language === 'ru' ? 'Уровень' : 'Level'} {building.level} / {def.maxLevel}
-            </div>
-            <div className={styles.incomeRow}>
-              <img src={getAssetUrl('currencies/silver')} alt="" className={styles.incomeIcon} />
-              +{formatNumber(building.income)}/{language === 'ru' ? 'ч' : 'hr'}
-            </div>
+        </div>
+
+        {/* Building Info */}
+        <div className={styles.buildingHeader}>
+          <div className={styles.buildingName}>
+            {language === 'ru' ? def.nameRu : def.nameEn}
+          </div>
+          <div className={styles.levelBadge}>
+            <span
+              className={styles.levelDot}
+              style={{ backgroundColor: levelColor }}
+            />
+            {language === 'ru' ? 'Уровень' : 'Level'} {building.level} / {def.maxLevel}
+          </div>
+          <div className={styles.incomeRow}>
+            <img src={getAssetUrl('currencies/silver')} alt="" className={styles.incomeIcon} />
+            +{formatNumber(building.income)}/{language === 'ru' ? 'ч' : 'hr'}
           </div>
         </div>
 
@@ -137,7 +149,7 @@ export function BuildingInfoSheet({ building, onClose }: BuildingInfoSheetProps)
           ) : isOnCooldown ? (
             <>
               <div className={styles.cooldownText}>
-                ⏱ {language === 'ru' ? 'Кулдаун' : 'Cooldown'}: {cooldownText}
+                {language === 'ru' ? 'Кулдаун' : 'Cooldown'}: {cooldownText}
               </div>
               <Button variant="secondary" size="lg" fullWidth disabled>
                 {language === 'ru' ? 'Подождите...' : 'Wait...'}
@@ -173,6 +185,7 @@ export function BuildingInfoSheet({ building, onClose }: BuildingInfoSheetProps)
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

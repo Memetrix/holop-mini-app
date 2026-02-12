@@ -79,45 +79,66 @@ function randomRange(min: number, max: number): number {
   return min + Math.random() * (max - min);
 }
 
-function drawIslandBlob(gfx: Graphics, cx: number, cy: number, radius: number, seed: number, occupied: boolean) {
+function generateSmoothBlob(
+  cx: number, cy: number, radius: number, seed: number,
+  ySquash: number, yOffset: number, pointCount: number,
+): { x: number; y: number }[] {
+  // Generate smooth radii with Catmull-Rom-like interpolation
   const rng = seededRandom(seed);
-  const points = 8;
-  const angleStep = (Math.PI * 2) / points;
-
-  // Draw shadow first
-  gfx.moveTo(cx + (radius + 4) * (0.85 + rng() * 0.3), cy + 6);
-  for (let i = 1; i <= points; i++) {
+  const rawRadii: number[] = [];
+  for (let i = 0; i < pointCount; i++) {
+    rawRadii.push(radius * (0.88 + rng() * 0.24)); // tighter range = rounder
+  }
+  // Smooth pass: average each radius with neighbors (wrapping)
+  const smoothed: number[] = [];
+  for (let i = 0; i < pointCount; i++) {
+    const prev = rawRadii[(i - 1 + pointCount) % pointCount];
+    const curr = rawRadii[i];
+    const next = rawRadii[(i + 1) % pointCount];
+    smoothed.push(prev * 0.25 + curr * 0.5 + next * 0.25);
+  }
+  // Generate points
+  const angleStep = (Math.PI * 2) / pointCount;
+  const pts: { x: number; y: number }[] = [];
+  for (let i = 0; i < pointCount; i++) {
     const angle = i * angleStep;
-    const r = (radius + 4) * (0.85 + rng() * 0.3);
-    const px = cx + Math.cos(angle) * r;
-    const py = cy + 6 + Math.sin(angle) * r * 0.6;
-    const cpAngle = angle - angleStep / 2;
-    const cpR = (radius + 8) * (0.9 + rng() * 0.2);
-    const cpx = cx + Math.cos(cpAngle) * cpR;
-    const cpy = cy + 6 + Math.sin(cpAngle) * cpR * 0.6;
-    gfx.quadraticCurveTo(cpx, cpy, px, py);
+    const r = smoothed[i];
+    pts.push({
+      x: cx + Math.cos(angle) * r,
+      y: cy + yOffset + Math.sin(angle) * r * ySquash,
+    });
+  }
+  return pts;
+}
+
+function drawSmoothClosedCurve(gfx: Graphics, pts: { x: number; y: number }[]) {
+  const n = pts.length;
+  if (n < 3) return;
+  // Start at midpoint between last and first
+  const mx = (pts[n - 1].x + pts[0].x) / 2;
+  const my = (pts[n - 1].y + pts[0].y) / 2;
+  gfx.moveTo(mx, my);
+  for (let i = 0; i < n; i++) {
+    const curr = pts[i];
+    const next = pts[(i + 1) % n];
+    const midX = (curr.x + next.x) / 2;
+    const midY = (curr.y + next.y) / 2;
+    gfx.quadraticCurveTo(curr.x, curr.y, midX, midY);
   }
   gfx.closePath();
+}
+
+function drawIslandBlob(gfx: Graphics, cx: number, cy: number, radius: number, seed: number, occupied: boolean) {
+  const pointCount = 12; // more points = smoother
+
+  // Draw shadow
+  const shadowPts = generateSmoothBlob(cx, cy, radius + 5, seed, 0.55, 6, pointCount);
+  drawSmoothClosedCurve(gfx, shadowPts);
   gfx.fill({ color: 0x000000, alpha: 0.2 });
 
-  // Reset RNG for island shape
-  const rng2 = seededRandom(seed);
-
   // Main island shape
-  const firstR = radius * (0.85 + rng2() * 0.3);
-  gfx.moveTo(cx + firstR, cy);
-  for (let i = 1; i <= points; i++) {
-    const angle = i * angleStep;
-    const r = radius * (0.85 + rng2() * 0.3);
-    const px = cx + Math.cos(angle) * r;
-    const py = cy + Math.sin(angle) * r * 0.7;
-    const cpAngle = angle - angleStep / 2;
-    const cpR = radius * (0.9 + rng2() * 0.2);
-    const cpx = cx + Math.cos(cpAngle) * cpR;
-    const cpy = cy + Math.sin(cpAngle) * cpR * 0.7;
-    gfx.quadraticCurveTo(cpx, cpy, px, py);
-  }
-  gfx.closePath();
+  const mainPts = generateSmoothBlob(cx, cy, radius, seed, 0.65, 0, pointCount);
+  drawSmoothClosedCurve(gfx, mainPts);
   gfx.fill({ color: occupied ? 0x3B2B1A : 0x2D2216, alpha: 0.85 });
   gfx.stroke({ color: 0xC8973E, width: 1.5, alpha: occupied ? 0.18 : 0.08 });
 
@@ -125,12 +146,12 @@ function drawIslandBlob(gfx: Graphics, cx: number, cy: number, radius: number, s
   const rng3 = seededRandom(seed + 100);
   for (let i = 0; i < 5; i++) {
     const angle = rng3() * Math.PI * 2;
-    const dist = rng3() * radius * 0.5;
+    const dist = rng3() * radius * 0.45;
     const bx = cx + Math.cos(angle) * dist;
-    const by = cy + Math.sin(angle) * dist * 0.7;
+    const by = cy + Math.sin(angle) * dist * 0.65;
     const br = 4 + rng3() * 8;
     gfx.circle(bx, by, br);
-    gfx.fill({ color: 0x2D3B1A, alpha: 0.15 + rng3() * 0.1 });
+    gfx.fill({ color: 0x2D3B1A, alpha: 0.12 + rng3() * 0.08 });
   }
 }
 
