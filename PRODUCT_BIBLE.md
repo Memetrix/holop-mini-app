@@ -695,10 +695,19 @@ Use these values for the demo/dev player state. All data is consistent and reali
 
 ### Sub-Screens by Tab
 
-**Territory**:
-- Building list (scrollable)
-- Building detail / upgrade modal
-- Income summary
+**Territory** (Interactive City Map):
+- Fullscreen PixiJS pannable city (900x1400 world, 16 island slots)
+- Procedural terrain: organic island blobs, dirt paths, grass decoration
+- Building sprites float on islands with level-colored particles
+- Tap empty slot → BuildScreen (choose building to construct)
+- Tap existing building → BuildingInfoSheet (info + upgrade)
+- Drag to pan, momentum scrolling, tap vs drag disambiguation
+- Floating HUD: income card (top), collect button (bottom)
+- CoinShower animation on income collection
+- Particle color by building level: Bronze (1-3), Silver (4-6), Gold (7-9), Emerald (10-12), Diamond (13-15)
+- Upgrade-ready buildings glow brightly (gold pulse)
+- Locked slots (gray, lock icon) unlock by title progression
+- Slot unlock: 0-4 at title 1, 5-7 at title 3, 8-9 at title 5, 10-12 at title 7, 13-15 at title 9
 
 **Raids**:
 - Opponent finder

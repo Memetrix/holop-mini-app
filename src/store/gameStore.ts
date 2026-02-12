@@ -18,6 +18,7 @@ import type {
 import { GAME } from '@/config/constants';
 import { getBuildingById, getBuildingIncome, getBuildingCost } from '@/config/buildings';
 import { getNextTitle } from '@/config/titles';
+import { findFreeSlot } from '@/config/cityLayout';
 import { MONSTERS } from '@/config/monsters';
 
 // ─── Mock Data ───
@@ -52,12 +53,13 @@ const MOCK_USER: User = {
 };
 
 const MOCK_BUILDINGS: Building[] = [
-  { id: 'izba', level: 12, income: 180, cooldownUntil: null },
-  { id: 'pashnya', level: 10, income: 115, cooldownUntil: null },
-  { id: 'kuznitsa', level: 8, income: 192, cooldownUntil: null },
-  { id: 'torg', level: 6, income: 354, cooldownUntil: null },
-  { id: 'krepost', level: 3, income: 409, cooldownUntil: null },
+  { id: 'izba', level: 12, income: 180, cooldownUntil: null, slotIndex: 0 },
+  { id: 'pashnya', level: 10, income: 115, cooldownUntil: null, slotIndex: 1 },
+  { id: 'kuznitsa', level: 8, income: 192, cooldownUntil: null, slotIndex: 2 },
+  { id: 'torg', level: 6, income: 354, cooldownUntil: null, slotIndex: 3 },
+  { id: 'krepost', level: 3, income: 409, cooldownUntil: null, slotIndex: 4 },
 ];
+
 
 const MOCK_SERFS: Serf[] = [
   {
@@ -142,7 +144,7 @@ interface GameState {
 
   // Buildings
   upgradeBuilding: (buildingId: string) => void;
-  buildNewBuilding: (buildingId: string) => void;
+  buildNewBuilding: (buildingId: string, slotIndex?: number) => void;
 
   // Raids
   refreshRaidTargets: () => void;
@@ -320,7 +322,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   // Build a new building
-  buildNewBuilding: (buildingId) => {
+  buildNewBuilding: (buildingId, slotIndex) => {
     const { user, buildings } = get();
     if (buildings.find(b => b.id === buildingId)) return; // Already built
 
@@ -329,11 +331,16 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     if (user.silver < def.baseCost) return;
 
+    // Determine slot: use provided or find first free
+    const occupiedSlots = buildings.map(b => b.slotIndex);
+    const assignedSlot = slotIndex ?? findFreeSlot(occupiedSlots, user.titleLevel) ?? 0;
+
     const newBuilding: Building = {
       id: buildingId,
       level: 1,
       income: def.baseIncome,
       cooldownUntil: null,
+      slotIndex: assignedSlot,
     };
 
     const newBuildings = [...buildings, newBuilding];

@@ -12,9 +12,10 @@ import styles from './BuildScreen.module.css';
 
 interface BuildScreenProps {
   onClose: () => void;
+  targetSlotIndex?: number;
 }
 
-export function BuildScreen({ onClose }: BuildScreenProps) {
+export function BuildScreen({ onClose, targetSlotIndex }: BuildScreenProps) {
   const user = useGameStore((s) => s.user);
   const buildings = useGameStore((s) => s.buildings);
   const buildNewBuilding = useGameStore((s) => s.buildNewBuilding);
@@ -27,7 +28,8 @@ export function BuildScreen({ onClose }: BuildScreenProps) {
 
   const handleBuild = (id: string) => {
     haptics.success();
-    buildNewBuilding(id);
+    buildNewBuilding(id, targetSlotIndex);
+    onClose();
   };
 
   return (

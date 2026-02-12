@@ -45,6 +45,7 @@ export interface Building {
   level: number;
   income: number;
   cooldownUntil: string | null;
+  slotIndex: number;
 }
 
 // ─── Serf ───
