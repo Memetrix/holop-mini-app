@@ -1,14 +1,29 @@
+import { useState } from 'react';
 import { Screen } from '@/components/layout/Screen';
 import { useGameStore } from '@/store/gameStore';
 import { getAssetUrl } from '@/config/assets';
 import { getDarkCaveMonsters, getGloryCaveMonsters } from '@/config/monsters';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
 import { Button } from '@/components/ui/Button';
+import { LootboxScene } from '@/pixi/LootboxScene';
+import type { LootReward } from '@/pixi/LootboxScene';
 import styles from './CavesScreen.module.css';
 
 export function CavesScreen() {
   const user = useGameStore((s) => s.user);
   const executeCaveBattle = useGameStore((s) => s.executeCaveBattle);
+  const [lootRewards, setLootRewards] = useState<LootReward[] | null>(null);
+
+  const handleFight = (monsterId: string) => {
+    const result = executeCaveBattle(monsterId);
+    if (result.won) {
+      const rewards: LootReward[] = [];
+      if (result.silverLooted > 0) rewards.push({ type: 'silver', amount: result.silverLooted, label: `+${result.silverLooted} серебра` });
+      if (result.goldLooted > 0) rewards.push({ type: 'gold', amount: result.goldLooted, label: `+${result.goldLooted} золота` });
+      if (result.reputationGained > 0) rewards.push({ type: 'stars', amount: result.reputationGained, label: `+${result.reputationGained} репутации` });
+      setLootRewards(rewards.length > 0 ? rewards : [{ type: 'silver', amount: 0, label: 'Ничего не найдено' }]);
+    }
+  };
 
   const darkCaveUnlocked = user.titleLevel >= 3;
   const gloryCaveUnlocked = user.titleLevel >= 4;
@@ -43,7 +58,7 @@ export function CavesScreen() {
                   </div>
                   <CurrencyBadge type="silver" amount={monster.silverLoot} size="sm" />
                 </div>
-                <Button variant="primary" size="sm" onClick={() => executeCaveBattle(monster.id)}>
+                <Button variant="primary" size="sm" onClick={() => handleFight(monster.id)}>
                   Бой
                 </Button>
               </div>
@@ -76,7 +91,7 @@ export function CavesScreen() {
                   </div>
                   <CurrencyBadge type="silver" amount={monster.silverLoot} size="sm" />
                 </div>
-                <Button variant="primary" size="sm" onClick={() => executeCaveBattle(monster.id)}>
+                <Button variant="primary" size="sm" onClick={() => handleFight(monster.id)}>
                   Бой
                 </Button>
               </div>
@@ -84,6 +99,17 @@ export function CavesScreen() {
           </div>
         )}
       </div>
+      {/* Lootbox Animation */}
+      {lootRewards && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(26,16,8,0.95)' }}>
+          <LootboxScene
+            rewards={lootRewards}
+            onComplete={() => setLootRewards(null)}
+            width={window.innerWidth}
+            height={window.innerHeight}
+          />
+        </div>
+      )}
     </Screen>
   );
 }

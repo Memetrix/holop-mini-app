@@ -9,6 +9,8 @@ import { getTitleByLevel, getNextTitle } from '@/config/titles';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
+import { BuildingScene } from '@/pixi/BuildingScene';
+import { CoinShower } from '@/pixi/CoinShower';
 import { BuildScreen } from './BuildScreen';
 import styles from './TerritoryScreen.module.css';
 
@@ -20,16 +22,32 @@ export function TerritoryScreen() {
   const upgradeBuilding = useGameStore((s) => s.upgradeBuilding);
   const haptics = useHaptics();
   const [showBuildSheet, setShowBuildSheet] = useState(false);
+  const [showCoinShower, setShowCoinShower] = useState(false);
+  const [collectedAmount, setCollectedAmount] = useState(0);
 
   const title = getTitleByLevel(user.titleLevel);
   const nextTitle = getNextTitle(user.titleLevel);
   const handleCollect = () => {
     haptics.success();
+    // Calculate amount before collecting (store updates silver)
+    const now = Date.now();
+    const lastCollect = new Date(user.lastIncomeCollect).getTime();
+    const hoursPassed = (now - lastCollect) / (1000 * 60 * 60);
+    const earned = Math.floor(totalIncome * hoursPassed);
+    if (earned > 0) {
+      setCollectedAmount(earned);
+      setShowCoinShower(true);
+    }
     collectIncome();
   };
 
   return (
     <Screen>
+      {/* Animated Building Map */}
+      <div style={{ margin: 'calc(-1 * var(--space-4))', marginBottom: 'var(--space-4)', borderBottom: '1px solid var(--border)' }}>
+        <BuildingScene width={window.innerWidth} height={240} />
+      </div>
+
       {/* Title Progress */}
       <div className={styles.titleCard}>
         <div className={styles.titleHeader}>
@@ -52,10 +70,10 @@ export function TerritoryScreen() {
       {/* Action Buttons */}
       <div className={styles.actionRow}>
         <Button variant="primary" size="lg" fullWidth onClick={handleCollect}>
-          💰 Собрать доход
+          <img src={getAssetUrl('ui_territory/ui_collect_income')} alt="" style={{width:20,height:20}} /> Собрать доход
         </Button>
         <Button variant="secondary" size="md" onClick={() => setShowBuildSheet(true)}>
-          🏗️ Строить
+          <img src={getAssetUrl('ui_territory/ui_build')} alt="" style={{width:20,height:20}} /> Строить
         </Button>
       </div>
 
@@ -118,6 +136,14 @@ export function TerritoryScreen() {
 
       {/* Build Sheet */}
       {showBuildSheet && <BuildScreen onClose={() => setShowBuildSheet(false)} />}
+
+      {/* Coin Shower Animation */}
+      {showCoinShower && (
+        <CoinShower
+          amount={collectedAmount}
+          onComplete={() => setShowCoinShower(false)}
+        />
+      )}
     </Screen>
   );
 }

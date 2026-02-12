@@ -7,6 +7,7 @@ import { getTitleByLevel } from '@/config/titles';
 import { formatNumber } from '@/hooks/useFormatNumber';
 import { Button } from '@/components/ui/Button';
 import { BattleResultModal } from '@/components/game/BattleResultModal';
+import { CombatScene } from '@/pixi/CombatScene';
 import type { BattleResult } from '@/store/types';
 import styles from './BattleScreen.module.css';
 
@@ -35,16 +36,17 @@ export function BattleScreen({ targetId, onBack }: BattleScreenProps) {
   const targetTitle = target ? getTitleByLevel(target.titleLevel) : null;
 
   const startBattle = useCallback(() => {
-    setPhase('fighting');
     haptics.heavy();
-
-    // Simulate a brief delay for battle animation
-    setTimeout(() => {
-      const battleResult = executeRaid(targetId);
-      setResult(battleResult);
-      setPhase('done');
-    }, 1500);
+    // Compute result immediately so CombatScene can replay it
+    const battleResult = executeRaid(targetId);
+    setResult(battleResult);
+    setPhase('fighting');
+    // CombatScene will call handleCombatComplete when done
   }, [executeRaid, targetId, haptics]);
+
+  const handleCombatComplete = useCallback(() => {
+    setPhase('done');
+  }, []);
 
   // Cleanup overflow on unmount
   useEffect(() => {
@@ -115,11 +117,17 @@ export function BattleScreen({ targetId, onBack }: BattleScreenProps) {
         </div>
       )}
 
-      {/* Fight Animation */}
-      {phase === 'fighting' && (
-        <div className={styles.fightingOverlay}>
-          <div className={styles.spinner} />
-          <span className={styles.fightingText}>Битва идёт...</span>
+      {/* Fight Animation — CombatScene */}
+      {phase === 'fighting' && result && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'var(--bg-dark)' }}>
+          <CombatScene
+            playerAssetKey={playerTitle.assetKey}
+            opponentAssetKey={targetTitle.assetKey}
+            result={result}
+            onComplete={handleCombatComplete}
+            width={window.innerWidth}
+            height={window.innerHeight}
+          />
         </div>
       )}
 

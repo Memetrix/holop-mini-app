@@ -541,7 +541,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       });
       get().addToast({
         type: 'reward',
-        message: `🎉 Новый титул: ${nextTitle.nameRu}!`,
+        message: `Новый титул: ${nextTitle.nameRu}!`,
       });
       return true;
     }
