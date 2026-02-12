@@ -244,19 +244,21 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
     let dragDistance = 0;
     let dragStartTime = 0;
 
-    // Initial camera position — center on upper part of world
+    // Initial camera position — center horizontally, show top islands below HUD
     let worldX = -(WORLD_WIDTH / 2 - width / 2);
-    let worldY = -50;
+    let worldY = 80;
 
     // Plus icon references for pulsing
     const plusIcons: { gfx: Graphics; slot: CitySlot }[] = [];
 
-    // Clamp world position
+    // Clamp world position with padding for HUD overlays
+    const HUD_TOP_PADDING = 120;    // space for income card at top
+    const HUD_BOTTOM_PADDING = 80;  // space for collect button at bottom
     function clampWorld() {
       const minX = -(WORLD_WIDTH - width);
       const maxX = 0;
-      const minY = -(WORLD_HEIGHT - height);
-      const maxY = 0;
+      const minY = -(WORLD_HEIGHT - height + HUD_BOTTOM_PADDING);
+      const maxY = HUD_TOP_PADDING;
       worldX = Math.max(minX, Math.min(maxX, worldX));
       worldY = Math.max(minY, Math.min(maxY, worldY));
     }
