@@ -51,26 +51,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 160px;
+  height: 220px;
   margin-bottom: var(--space-3);
 }
 
 .imageGlow {
   position: absolute;
-  width: 160px;
-  height: 160px;
+  width: 220px;
+  height: 220px;
   border-radius: 50%;
-  filter: blur(40px);
-  opacity: 0.5;
+  filter: blur(50px);
+  opacity: 0.55;
 }
 
 .bigImage {
-  width: 140px;
-  height: 140px;
+  width: 200px;
+  height: 200px;
   object-fit: contain;
   position: relative;
   z-index: 1;
-  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 8px 28px rgba(0, 0, 0, 0.6));
 }
 
 /* ─── Building Info ─── */

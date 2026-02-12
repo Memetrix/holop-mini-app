@@ -87,6 +87,9 @@ interface TelegramWebApp {
   setHeaderColor: (color: string) => void;
   enableClosingConfirmation: () => void;
   disableClosingConfirmation: () => void;
+  isVerticalSwipesEnabled: boolean;
+  disableVerticalSwipes: () => void;
+  enableVerticalSwipes: () => void;
 }
 
 export function useTelegram() {
@@ -99,6 +102,10 @@ export function useTelegram() {
       tg.setBackgroundColor('#1A1008');
       tg.setHeaderColor('#1A1008');
       tg.enableClosingConfirmation();
+      // Disable pull-to-close swipe gesture (Bot API 7.7+)
+      if (tg.disableVerticalSwipes) {
+        tg.disableVerticalSwipes();
+      }
     }
   }, [tg]);
 
