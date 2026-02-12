@@ -1,16 +1,17 @@
 .screen {
-  flex: 1;
+  position: fixed;
+  top: var(--top-bar-height);
+  bottom: var(--tab-bar-height);
+  left: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
-  margin-top: var(--top-bar-height);
-  margin-bottom: var(--tab-bar-height);
-  min-height: 0;
-  position: relative;
 }
 
 .scrollable {
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior-y: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
   -webkit-overflow-scrolling: touch;
@@ -23,4 +24,5 @@
 .padded {
   padding: var(--space-4);
   padding-top: calc(var(--safe-area-top) + var(--space-4));
+  padding-bottom: var(--space-4);
 }
