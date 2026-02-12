@@ -188,12 +188,23 @@ function drawLockIcon(gfx: Graphics, cx: number, cy: number) {
 
 function createUpgradeGlow(radius: number): Graphics {
   const glow = new Graphics();
-  for (let i = 4; i >= 1; i--) {
-    const r = radius * (i / 4) * 1.2;
-    const a = 0.08 * (1 - i / 4) + 0.02;
+  // Outer soft halo — large warm bloom
+  for (let i = 6; i >= 1; i--) {
+    const r = radius * (i / 6) * 1.6;
+    const a = 0.12 * (1 - i / 7) + 0.03;
     glow.circle(0, 0, r);
     glow.fill({ color: 0xC8973E, alpha: a });
   }
+  // Inner bright core
+  glow.circle(0, 0, radius * 0.5);
+  glow.fill({ color: 0xFFD700, alpha: 0.15 });
+  glow.circle(0, 0, radius * 0.3);
+  glow.fill({ color: 0xFFE066, alpha: 0.12 });
+  // Bright ring outline around island edge
+  glow.circle(0, 0, radius * 0.95);
+  glow.stroke({ color: 0xC8973E, width: 3, alpha: 0.6 });
+  glow.circle(0, 0, radius * 1.05);
+  glow.stroke({ color: 0xFFD700, width: 2, alpha: 0.3 });
   return glow;
 }
 
@@ -770,10 +781,13 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
         entry.sprite.width = buildingSize * levelScale * breathe;
         entry.sprite.height = buildingSize * levelScale * breathe;
 
-        // Upgrade-ready glow pulse (brighter, faster)
+        // Upgrade-ready glow pulse (bright, breathing)
         if (entry.upgradeGlow) {
-          const upgradePulse = 0.5 + 0.5 * Math.sin(time * 3 + entry.phaseOffset);
+          const upgradePulse = 0.6 + 0.4 * Math.sin(time * 2.5 + entry.phaseOffset);
           entry.upgradeGlow.alpha = upgradePulse;
+          // Scale breathing — glow expands and contracts
+          const glowBreathe = 1 + 0.08 * Math.sin(time * 2.5 + entry.phaseOffset);
+          entry.upgradeGlow.scale.set(glowBreathe);
           entry.upgradeGlow.y = entry.sprite.y;
         }
       }
