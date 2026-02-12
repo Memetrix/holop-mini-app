@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Screen } from '@/components/layout/Screen';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
@@ -8,6 +9,7 @@ import { getTitleByLevel, getNextTitle } from '@/config/titles';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
+import { BuildScreen } from './BuildScreen';
 import styles from './TerritoryScreen.module.css';
 
 export function TerritoryScreen() {
@@ -17,6 +19,7 @@ export function TerritoryScreen() {
   const collectIncome = useGameStore((s) => s.collectIncome);
   const upgradeBuilding = useGameStore((s) => s.upgradeBuilding);
   const haptics = useHaptics();
+  const [showBuildSheet, setShowBuildSheet] = useState(false);
 
   const title = getTitleByLevel(user.titleLevel);
   const nextTitle = getNextTitle(user.titleLevel);
@@ -46,10 +49,15 @@ export function TerritoryScreen() {
         )}
       </div>
 
-      {/* Collect Income Button */}
-      <Button variant="primary" size="lg" fullWidth onClick={handleCollect}>
-        Собрать доход
-      </Button>
+      {/* Action Buttons */}
+      <div className={styles.actionRow}>
+        <Button variant="primary" size="lg" fullWidth onClick={handleCollect}>
+          💰 Собрать доход
+        </Button>
+        <Button variant="secondary" size="md" onClick={() => setShowBuildSheet(true)}>
+          🏗️ Строить
+        </Button>
+      </div>
 
       {/* Buildings List */}
       <div className={styles.sectionTitle}>
@@ -107,6 +115,9 @@ export function TerritoryScreen() {
           );
         })}
       </div>
+
+      {/* Build Sheet */}
+      {showBuildSheet && <BuildScreen onClose={() => setShowBuildSheet(false)} />}
     </Screen>
   );
 }

@@ -51,6 +51,16 @@
   font-variant-numeric: tabular-nums;
 }
 
+.actionRow {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.actionRow > *:first-child {
+  flex: 1;
+}
+
 .sectionTitle {
   display: flex;
   align-items: center;

@@ -7,6 +7,7 @@ import { formatIncome } from '@/hooks/useFormatNumber';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
 import { Button } from '@/components/ui/Button';
+import { DailyBonus } from './DailyBonus';
 import styles from './ProfileScreen.module.css';
 
 export function ProfileScreen() {
@@ -51,6 +52,9 @@ export function ProfileScreen() {
           </div>
         )}
       </div>
+
+      {/* Daily Bonus */}
+      <DailyBonus currentStreak={user.dailyStreak} />
 
       {/* HP Bar */}
       <div className={styles.section}>

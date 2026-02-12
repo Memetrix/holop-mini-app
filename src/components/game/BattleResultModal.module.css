@@ -1,0 +1,217 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 200ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sheet {
+  width: 100%;
+  max-width: 428px;
+  max-height: 85vh;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  border-top: 1px solid var(--border);
+  padding: var(--space-4);
+  padding-bottom: calc(var(--space-6) + var(--safe-area-bottom));
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 400ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border-active);
+  border-radius: var(--radius-full);
+  margin: 0 auto var(--space-4);
+  flex-shrink: 0;
+}
+
+/* ─── Header ─── */
+.header {
+  position: relative;
+  text-align: center;
+  padding: var(--space-4) var(--space-2);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+  overflow: hidden;
+}
+
+.headerWon {
+  background: linear-gradient(135deg, rgba(200, 151, 62, 0.15), rgba(200, 151, 62, 0.05));
+  border: 1px solid rgba(200, 151, 62, 0.3);
+}
+
+.headerLost {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.15), rgba(220, 53, 69, 0.05));
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 2px;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.headerWon .title {
+  color: var(--gold-light);
+  text-shadow: 0 0 20px rgba(200, 151, 62, 0.5);
+}
+
+.headerLost .title {
+  color: var(--danger);
+  text-shadow: 0 0 20px rgba(220, 53, 69, 0.3);
+}
+
+/* Gold shimmer animation for victory */
+.shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(200, 151, 62, 0.15) 40%,
+    rgba(200, 151, 62, 0.3) 50%,
+    rgba(200, 151, 62, 0.15) 60%,
+    transparent 100%
+  );
+  animation: shimmerMove 2.5s ease-in-out infinite;
+}
+
+@keyframes shimmerMove {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ─── Opponent ─── */
+.opponent {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-4);
+  margin-top: calc(-1 * var(--space-2));
+}
+
+/* ─── Loot Section ─── */
+.lootSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.sectionLabel {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 var(--space-2);
+}
+
+.lootGrid {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* ─── Combat Log ─── */
+.logSection {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--space-4);
+}
+
+.logScroll {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-right: var(--space-1);
+}
+
+.logScroll::-webkit-scrollbar {
+  width: 3px;
+}
+
+.logScroll::-webkit-scrollbar-thumb {
+  background: var(--border-active);
+  border-radius: 2px;
+}
+
+.logEntry {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+}
+
+.logTurn {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+.logDamages {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dmgGreen {
+  color: var(--success);
+}
+
+.dmgSep {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.dmgRed {
+  color: var(--danger);
+}
+
+.logHp {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ─── Actions ─── */
+.actions {
+  flex-shrink: 0;
+}

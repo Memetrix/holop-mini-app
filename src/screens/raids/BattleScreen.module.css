@@ -1,0 +1,147 @@
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--space-2) 0;
+  min-height: 44px;
+  margin-bottom: var(--space-3);
+}
+
+.backBtn:active {
+  opacity: 0.6;
+}
+
+/* ─── Not Found ─── */
+.notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-10) var(--space-4);
+  gap: var(--space-4);
+  color: var(--text-muted);
+}
+
+/* ─── VS Container ─── */
+.vsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-6) 0;
+}
+
+.fighter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.fighterAvatar {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-bottom: var(--space-2);
+}
+
+.fighterName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--parchment);
+}
+
+.fighterTitle {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.fighterStats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--space-2);
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ─── VS Badge ─── */
+.vsBadge {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--gold-light);
+  background: var(--bg-card);
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  text-shadow: 0 0 10px rgba(200, 151, 62, 0.5);
+}
+
+.vsFighting {
+  animation: vsPulse 1s ease-in-out infinite;
+}
+
+@keyframes vsPulse {
+  0%, 100% {
+    transform: scale(1);
+    border-color: var(--gold);
+  }
+  50% {
+    transform: scale(1.1);
+    border-color: var(--gold-light);
+    box-shadow: 0 0 16px rgba(200, 151, 62, 0.4);
+  }
+}
+
+/* ─── Fighting Overlay ─── */
+.fightingOverlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) 0;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.fightingText {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--gold-light);
+  animation: fightFade 1.2s ease-in-out infinite;
+}
+
+@keyframes fightFade {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ─── Attack Section ─── */
+.attackSection {
+  padding: var(--space-4) 0;
+}

@@ -1,0 +1,131 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+}
+
+.card:active {
+  transform: scale(0.98);
+  border-color: var(--border-active);
+  box-shadow: 0 0 20px var(--glow-strong);
+}
+
+.image {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--gold-light);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.statLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--parchment);
+  font-variant-numeric: tabular-nums;
+}
+
+.atkValue {
+  color: var(--danger);
+}
+
+.defValue {
+  color: var(--info);
+}
+
+.hpValue {
+  color: var(--success);
+}
+
+.loot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--border);
+}
+
+.lootItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--parchment-dark);
+  font-variant-numeric: tabular-nums;
+}
+
+.lootIcon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.fightBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--touch-target);
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
+  background: linear-gradient(135deg, var(--danger), #C62828);
+  color: white;
+  box-shadow: 0 2px 8px rgba(229, 57, 53, 0.3);
+}
+
+.fightBtn:active:not(:disabled) {
+  transform: scale(0.96);
+  box-shadow: 0 0 16px rgba(229, 57, 53, 0.5);
+}
+
+.fightBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

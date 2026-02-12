@@ -1,18 +1,24 @@
+import { useState } from 'react';
 import { Screen } from '@/components/layout/Screen';
 import { useGameStore } from '@/store/gameStore';
 import { getAssetUrl } from '@/config/assets';
 import { getTitleByLevel } from '@/config/titles';
 import { Button } from '@/components/ui/Button';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
+import { BattleScreen } from './BattleScreen';
 import styles from './RaidsScreen.module.css';
 
 export function RaidsScreen() {
   const raidTargets = useGameStore((s) => s.raidTargets);
   const user = useGameStore((s) => s.user);
   const refreshTargets = useGameStore((s) => s.refreshRaidTargets);
-  const executeRaid = useGameStore((s) => s.executeRaid);
+  const [battleTargetId, setBattleTargetId] = useState<number | null>(null);
 
   const isPvpUnlocked = user.titleLevel >= 6;
+
+  if (battleTargetId !== null) {
+    return <BattleScreen targetId={battleTargetId} onBack={() => setBattleTargetId(null)} />;
+  }
 
   if (!isPvpUnlocked) {
     return (
@@ -54,7 +60,7 @@ export function RaidsScreen() {
               <Button
                 variant="primary"
                 size="sm"
-                onClick={() => executeRaid(target.id)}
+                onClick={() => setBattleTargetId(target.id)}
                 disabled={target.hasIronDome}
               >
                 {target.hasIronDome ? 'Защищён' : 'Напасть'}

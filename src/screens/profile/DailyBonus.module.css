@@ -1,0 +1,127 @@
+.card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--gold-light);
+  margin: 0;
+}
+
+.streak {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ─── Days Row ─── */
+.daysRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.dayCircle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  position: relative;
+  width: 40px;
+  min-height: 56px;
+}
+
+.dayNumber {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-body);
+  transition: all var(--transition-normal);
+}
+
+.dayReward {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ─── Day States ─── */
+
+/* Claimed (past days) */
+.dayClaimed .dayNumber {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: var(--bg-dark);
+  border: 2px solid var(--gold);
+}
+
+.dayClaimed .dayReward {
+  color: var(--gold);
+}
+
+.checkmark {
+  position: absolute;
+  top: -2px;
+  right: 0;
+  font-size: 10px;
+  color: var(--success);
+  font-weight: 700;
+}
+
+/* Current day (unclaimed) */
+.dayCurrent .dayNumber {
+  background: var(--bg-card);
+  color: var(--gold-light);
+  border: 2px solid var(--gold);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.dayCurrent .dayReward {
+  color: var(--gold-light);
+  font-weight: 600;
+}
+
+.claimLabel {
+  position: absolute;
+  top: -2px;
+  right: 0;
+  font-size: 11px;
+  color: var(--gold-light);
+  font-weight: 700;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(200, 151, 62, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(200, 151, 62, 0);
+  }
+}
+
+/* Future days */
+.dayFuture .dayNumber {
+  background: var(--bg-dark);
+  color: var(--text-muted);
+  border: 2px solid var(--border);
+  opacity: 0.5;
+}
