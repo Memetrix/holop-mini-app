@@ -1,6 +1,6 @@
 .container {
   position: fixed;
-  top: calc(var(--top-bar-height) + var(--safe-area-top) + var(--space-2));
+  top: calc(var(--top-bar-height) + var(--space-2));
   left: var(--space-4);
   right: var(--space-4);
   z-index: var(--z-toast);

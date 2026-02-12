@@ -8,7 +8,7 @@
   justify-content: space-between;
   height: var(--top-bar-height);
   padding: 0 var(--space-4);
-  padding-top: var(--safe-area-top);
+  padding-top: env(safe-area-inset-top, 0px);
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));

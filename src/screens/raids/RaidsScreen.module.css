@@ -49,8 +49,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   padding: var(--space-3);
 }

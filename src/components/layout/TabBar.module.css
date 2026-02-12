@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: space-around;
   height: var(--tab-bar-height);
-  padding-bottom: var(--safe-area-bottom);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
