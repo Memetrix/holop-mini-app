@@ -216,8 +216,6 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
 
     // Pan state (closure variables for 60fps)
     let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
     let lastPointerX = 0;
     let lastPointerY = 0;
     let velocityX = 0;
@@ -282,8 +280,6 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
 
       app.stage.on('pointerdown', (e) => {
         isDragging = true;
-        dragStartX = e.global.x;
-        dragStartY = e.global.y;
         lastPointerX = e.global.x;
         lastPointerY = e.global.y;
         velocityX = 0;
