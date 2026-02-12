@@ -37,38 +37,54 @@ export function App() {
 
   // Prevent Telegram WebApp pull-to-close / overscroll bounce
   useEffect(() => {
-    const handler = (e: TouchEvent) => {
-      // Allow scrolling inside elements that have overflow-y: auto/scroll
-      const target = e.target as HTMLElement;
-      const scrollable = target.closest('[data-scrollable], .scrollable, [style*="overflow"]');
-      if (scrollable) {
-        const el = scrollable as HTMLElement;
-        const { scrollTop, scrollHeight, clientHeight } = el;
-        // At top and trying to scroll up — block
-        if (scrollTop <= 0 && e.touches[0].clientY > (handler as unknown as { lastY: number }).lastY) {
-          e.preventDefault();
+    let lastY = 0;
+
+    const onTouchStart = (e: TouchEvent) => {
+      lastY = e.touches[0]?.clientY ?? 0;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!e.cancelable) return;
+
+      const currentY = e.touches[0]?.clientY ?? 0;
+      const deltaY = currentY - lastY;
+
+      // Find the nearest scrollable ancestor
+      let target = e.target as HTMLElement | null;
+      while (target && target !== document.body) {
+        const style = window.getComputedStyle(target);
+        const overflowY = style.overflowY;
+        if (overflowY === 'auto' || overflowY === 'scroll') {
+          const { scrollTop, scrollHeight, clientHeight } = target;
+          const isAtTop = scrollTop <= 0;
+          const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+
+          // Scrolling up at top → block (pull-to-close trigger)
+          if (isAtTop && deltaY > 0) {
+            e.preventDefault();
+            return;
+          }
+          // Scrolling down at bottom → block (overscroll bounce)
+          if (isAtBottom && deltaY < 0) {
+            e.preventDefault();
+            return;
+          }
+          // Inside scrollable area with room to scroll → allow
+          lastY = currentY;
+          return;
         }
-        // At bottom and trying to scroll down — block
-        if (scrollTop + clientHeight >= scrollHeight && e.touches[0].clientY < (handler as unknown as { lastY: number }).lastY) {
-          e.preventDefault();
-        }
-        (handler as unknown as { lastY: number }).lastY = e.touches[0].clientY;
-        return;
+        target = target.parentElement;
       }
-      // No scrollable parent — prevent all overscroll
+
+      // No scrollable parent — block all touch movement to prevent pull-to-close
       e.preventDefault();
     };
-    (handler as unknown as { lastY: number }).lastY = 0;
 
-    const trackStart = (e: TouchEvent) => {
-      (handler as unknown as { lastY: number }).lastY = e.touches[0].clientY;
-    };
-
-    document.addEventListener('touchstart', trackStart, { passive: true });
-    document.addEventListener('touchmove', handler, { passive: false });
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
     return () => {
-      document.removeEventListener('touchstart', trackStart);
-      document.removeEventListener('touchmove', handler);
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchmove', onTouchMove);
     };
   }, []);
 

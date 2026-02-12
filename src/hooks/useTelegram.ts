@@ -106,6 +106,16 @@ export function useTelegram() {
       if (tg.disableVerticalSwipes) {
         tg.disableVerticalSwipes();
       }
+      // Re-call after a short delay — TG WebApp may not be fully ready on first call
+      const timer = setTimeout(() => {
+        try {
+          tg.expand();
+          if (tg.disableVerticalSwipes) {
+            tg.disableVerticalSwipes();
+          }
+        } catch { /* ignore if already destroyed */ }
+      }, 500);
+      return () => clearTimeout(timer);
     }
   }, [tg]);
 

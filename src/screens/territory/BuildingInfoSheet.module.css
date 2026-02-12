@@ -45,32 +45,40 @@
   margin: 0 auto var(--space-3);
 }
 
-/* ─── Large Building Image ─── */
+/* ─── Hero Building Image (half-screen showcase) ─── */
 .imageSection {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 220px;
+  height: 44vw;
+  max-height: 320px;
+  min-height: 200px;
   margin-bottom: var(--space-3);
 }
 
 .imageGlow {
   position: absolute;
-  width: 220px;
-  height: 220px;
+  width: 80%;
+  height: 80%;
+  max-width: 300px;
+  max-height: 300px;
   border-radius: 50%;
-  filter: blur(50px);
-  opacity: 0.55;
+  filter: blur(60px);
+  opacity: 0.6;
 }
 
 .bigImage {
-  width: 200px;
-  height: 200px;
+  width: 70vw;
+  height: 70vw;
+  max-width: 280px;
+  max-height: 280px;
+  min-width: 180px;
+  min-height: 180px;
   object-fit: contain;
   position: relative;
   z-index: 1;
-  filter: drop-shadow(0 8px 28px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 10px 36px rgba(0, 0, 0, 0.65));
 }
 
 /* ─── Building Info ─── */

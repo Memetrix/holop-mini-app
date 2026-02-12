@@ -208,8 +208,8 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
 
   const buildingsRef = useRef(buildings);
   const onSlotTapRef = useRef(onSlotTap);
-  // Persist camera position across scene rebuilds (e.g. when building is constructed)
-  const cameraRef = useRef<{ x: number; y: number } | null>(null);
+  // Persist camera position & zoom across scene rebuilds (e.g. when building is constructed)
+  const cameraRef = useRef<{ x: number; y: number; scale: number } | null>(null);
 
   useEffect(() => { buildingsRef.current = buildings; }, [buildings]);
   useEffect(() => { onSlotTapRef.current = onSlotTap; }, [onSlotTap]);
@@ -252,6 +252,15 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
     let dragDistance = 0;
     let dragStartTime = 0;
 
+    // Zoom state (pinch-to-zoom)
+    const MIN_SCALE = 0.5;
+    const MAX_SCALE = 1.6;
+    let worldScale = cameraRef.current?.scale ?? 1;
+    let isPinching = false;
+    let lastPinchDist = 0;
+    let pinchCenterX = 0;
+    let pinchCenterY = 0;
+
     // Initial camera position — restore previous position or center horizontally
     let worldX = cameraRef.current?.x ?? -(WORLD_WIDTH / 2 - width / 2);
     let worldY = cameraRef.current?.y ?? 80;
@@ -259,16 +268,27 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
     // Plus icon references for pulsing
     const plusIcons: { gfx: Graphics; slot: CitySlot }[] = [];
 
-    // Clamp world position with padding for HUD overlays
+    // Clamp world position with padding for HUD overlays (accounts for zoom)
     const HUD_TOP_PADDING = 120;    // space for income card at top
     const HUD_BOTTOM_PADDING = 80;  // space for collect button at bottom
     function clampWorld() {
-      const minX = -(WORLD_WIDTH - width);
+      const scaledW = WORLD_WIDTH * worldScale;
+      const scaledH = WORLD_HEIGHT * worldScale;
+      const minX = -(scaledW - width);
       const maxX = 0;
-      const minY = -(WORLD_HEIGHT - height + HUD_BOTTOM_PADDING);
+      const minY = -(scaledH - height + HUD_BOTTOM_PADDING);
       const maxY = HUD_TOP_PADDING;
-      worldX = Math.max(minX, Math.min(maxX, worldX));
-      worldY = Math.max(minY, Math.min(maxY, worldY));
+      // When zoomed out enough that world fits in viewport, center it
+      if (scaledW <= width) {
+        worldX = (width - scaledW) / 2;
+      } else {
+        worldX = Math.max(minX, Math.min(maxX, worldX));
+      }
+      if (scaledH <= height) {
+        worldY = (height - scaledH) / 2;
+      } else {
+        worldY = Math.max(minY, Math.min(maxY, worldY));
+      }
     }
 
     async function setup() {
@@ -300,16 +320,18 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
       worldContainer.addChild(uiIconLayer);
       app.stage.addChild(worldContainer);
 
-      // Set initial position
+      // Set initial position and zoom
+      worldContainer.scale.set(worldScale);
       clampWorld();
       worldContainer.x = worldX;
       worldContainer.y = worldY;
 
-      // Setup pan/drag events
+      // Setup pan/drag events (PixiJS pointer events)
       app.stage.eventMode = 'static';
       app.stage.hitArea = new Rectangle(0, 0, width, height);
 
       app.stage.on('pointerdown', (e) => {
+        if (isPinching) return; // don't start drag during pinch
         isDragging = true;
         lastPointerX = e.global.x;
         lastPointerY = e.global.y;
@@ -320,7 +342,7 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
       });
 
       app.stage.on('pointermove', (e) => {
-        if (!isDragging) return;
+        if (!isDragging || isPinching) return;
         const dx = e.global.x - lastPointerX;
         const dy = e.global.y - lastPointerY;
         worldX += dx;
@@ -339,6 +361,7 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
       app.stage.on('pointerup', (e) => {
         if (!isDragging) return;
         isDragging = false;
+        if (isPinching) return; // don't fire tap after pinch
         const duration = performance.now() - dragStartTime;
 
         // Tap detection: small movement + short duration
@@ -351,6 +374,98 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
       app.stage.on('pointerupoutside', () => {
         isDragging = false;
       });
+
+      // ─── Pinch-to-zoom (native touch events on canvas) ───
+      const canvas = app.canvas;
+
+      function getTouchDist(t1: Touch, t2: Touch): number {
+        const dx = t1.clientX - t2.clientX;
+        const dy = t1.clientY - t2.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      function getTouchCenter(t1: Touch, t2: Touch): { x: number; y: number } {
+        return {
+          x: (t1.clientX + t2.clientX) / 2,
+          y: (t1.clientY + t2.clientY) / 2,
+        };
+      }
+
+      function onTouchStart(e: TouchEvent) {
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          isPinching = true;
+          isDragging = false;
+          lastPinchDist = getTouchDist(e.touches[0], e.touches[1]);
+          const center = getTouchCenter(e.touches[0], e.touches[1]);
+          pinchCenterX = center.x;
+          pinchCenterY = center.y;
+        }
+      }
+
+      function onTouchMove(e: TouchEvent) {
+        if (e.touches.length === 2 && isPinching) {
+          e.preventDefault();
+          const newDist = getTouchDist(e.touches[0], e.touches[1]);
+          const center = getTouchCenter(e.touches[0], e.touches[1]);
+
+          // Zoom factor from pinch distance change
+          const scaleFactor = newDist / lastPinchDist;
+          const newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, worldScale * scaleFactor));
+
+          if (newScale !== worldScale) {
+            // Zoom toward pinch center:
+            // Convert screen center to world coords, then adjust position
+            const screenCX = pinchCenterX;
+            const screenCY = pinchCenterY;
+            // World point under the pinch center (before zoom)
+            const worldPtX = (screenCX - worldX) / worldScale;
+            const worldPtY = (screenCY - worldY) / worldScale;
+
+            worldScale = newScale;
+            worldContainer.scale.set(worldScale);
+
+            // After zoom, keep the same world point under the pinch center
+            worldX = screenCX - worldPtX * worldScale;
+            worldY = screenCY - worldPtY * worldScale;
+            clampWorld();
+            worldContainer.x = worldX;
+            worldContainer.y = worldY;
+          }
+
+          // Also pan with two-finger drag
+          const panDx = center.x - pinchCenterX;
+          const panDy = center.y - pinchCenterY;
+          if (Math.abs(panDx) > 0.5 || Math.abs(panDy) > 0.5) {
+            worldX += panDx;
+            worldY += panDy;
+            clampWorld();
+            worldContainer.x = worldX;
+            worldContainer.y = worldY;
+          }
+
+          lastPinchDist = newDist;
+          pinchCenterX = center.x;
+          pinchCenterY = center.y;
+        }
+      }
+
+      function onTouchEnd(e: TouchEvent) {
+        if (e.touches.length < 2) {
+          isPinching = false;
+        }
+      }
+
+      canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+      canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+      canvas.addEventListener('touchend', onTouchEnd, { passive: false });
+
+      // Store cleanup for pinch listeners
+      (canvas as HTMLCanvasElement & { _pinchCleanup?: () => void })._pinchCleanup = () => {
+        canvas.removeEventListener('touchstart', onTouchStart);
+        canvas.removeEventListener('touchmove', onTouchMove);
+        canvas.removeEventListener('touchend', onTouchEnd);
+      };
 
       // Draw terrain
       drawTerrain();
@@ -397,9 +512,9 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
     }
 
     function handleTap(screenX: number, screenY: number) {
-      // Convert screen coordinates to world coordinates
-      const wx = screenX - worldX;
-      const wy = screenY - worldY;
+      // Convert screen coordinates to world coordinates (accounting for zoom)
+      const wx = (screenX - worldX) / worldScale;
+      const wy = (screenY - worldY) / worldScale;
 
       const currentBuildings = buildingsRef.current;
       const buildingMap = new Map(currentBuildings.map(b => [b.slotIndex, b]));
@@ -828,8 +943,14 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
     return () => {
       destroyed = true;
 
-      // Save camera position for seamless restore after rebuild
-      cameraRef.current = { x: worldX, y: worldY };
+      // Save camera position + zoom for seamless restore after rebuild
+      cameraRef.current = { x: worldX, y: worldY, scale: worldScale };
+
+      // Clean up pinch-to-zoom touch listeners
+      if (appInitialized) {
+        const canvas = app.canvas as HTMLCanvasElement & { _pinchCleanup?: () => void };
+        canvas._pinchCleanup?.();
+      }
 
       for (const p of coinParticles) { try { p.gfx.destroy(); } catch { /* */ } }
       coinParticles.length = 0;
