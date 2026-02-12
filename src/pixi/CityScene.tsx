@@ -253,7 +253,7 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
     let dragStartTime = 0;
 
     // Zoom state (pinch-to-zoom)
-    const MIN_SCALE = 0.5;
+    const MIN_SCALE = 0.55;
     const MAX_SCALE = 1.6;
     let worldScale = cameraRef.current?.scale ?? 1;
     let isPinching = false;
@@ -278,14 +278,16 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
       const maxX = 0;
       const minY = -(scaledH - height + HUD_BOTTOM_PADDING);
       const maxY = HUD_TOP_PADDING;
-      // When zoomed out enough that world fits in viewport, center it
+      // When zoomed out enough that world fits in viewport, center horizontally
       if (scaledW <= width) {
         worldX = (width - scaledW) / 2;
       } else {
         worldX = Math.max(minX, Math.min(maxX, worldX));
       }
-      if (scaledH <= height) {
-        worldY = (height - scaledH) / 2;
+      // Vertical: always respect HUD_TOP_PADDING so buildings aren't hidden behind TopBar
+      if (scaledH <= height - HUD_TOP_PADDING) {
+        // World fits below the HUD — push it down so top starts at HUD_TOP_PADDING
+        worldY = HUD_TOP_PADDING;
       } else {
         worldY = Math.max(minY, Math.min(maxY, worldY));
       }
