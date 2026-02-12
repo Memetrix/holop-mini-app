@@ -128,6 +128,16 @@
   letter-spacing: 0.05em;
 }
 
+.prereq {
+  font-size: 11px;
+  color: var(--warning);
+  font-style: italic;
+}
+
+.cardLocked {
+  opacity: 0.55;
+}
+
 .action {
   flex-shrink: 0;
 }

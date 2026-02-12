@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-2);
 }
 
 .title {
@@ -27,13 +27,22 @@
   font-weight: 500;
 }
 
+/* ─── Status Message ─── */
+.statusMessage {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--space-3);
+}
+
 /* ─── Days Row ─── */
 .daysRow {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-1);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-3);
 }
 
 .dayCircle {
@@ -124,4 +133,27 @@
   color: var(--text-muted);
   border: 2px solid var(--border);
   opacity: 0.5;
+}
+
+/* ─── Reward Breakdown ─── */
+.rewardBreakdown {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold-light);
+  margin-bottom: var(--space-3);
+}
+
+/* ─── Restore Section ─── */
+.restoreSection {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.restoreHint {
+  font-size: 11px;
+  color: var(--text-muted);
 }

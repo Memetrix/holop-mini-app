@@ -9,7 +9,15 @@ import { createPortal } from 'react-dom';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useSwipeSheet } from '@/hooks/useSwipeSheet';
-import { getBuildingById, getBuildingCost, getBuildingIncome } from '@/config/buildings';
+import {
+  getBuildingById,
+  getBuildingIncome,
+  getUpgradeSilverCost,
+  getUpgradeGoldCost,
+  getUpgradeCooldown,
+  getSpeedUpCost,
+  formatCooldown,
+} from '@/config/buildings';
 import { getAssetUrl } from '@/config/assets';
 import { getParticleColor } from '@/config/cityLayout';
 import { formatNumber } from '@/hooks/useFormatNumber';
@@ -42,11 +50,20 @@ export function BuildingInfoSheet({ building, onClose }: BuildingInfoSheetProps)
   const isOnCooldown = building.cooldownUntil && new Date(building.cooldownUntil).getTime() > Date.now();
 
   const nextLevel = building.level + 1;
-  const upgradeCost = isMaxLevel ? 0 : getBuildingCost(def, nextLevel);
-  const nextIncome = isMaxLevel ? building.income : getBuildingIncome(def, nextLevel);
   const currency = nextLevel <= 10 ? 'silver' : 'gold';
+  const upgradeCost = isMaxLevel
+    ? 0
+    : currency === 'silver'
+      ? getUpgradeSilverCost(def, building.level)
+      : getUpgradeGoldCost(def, building.level);
+  const nextIncome = isMaxLevel ? building.income : getBuildingIncome(def, nextLevel);
   const canAfford = currency === 'silver' ? user.silver >= upgradeCost : user.gold >= upgradeCost;
   const canUpgrade = !isMaxLevel && !isOnCooldown && canAfford;
+
+  // Cooldown info for display before pressing upgrade
+  const cooldownSeconds = isMaxLevel ? 0 : getUpgradeCooldown(building.level);
+  const cooldownDisplay = cooldownSeconds > 0 ? formatCooldown(cooldownSeconds) : '';
+  const speedUpStars = isMaxLevel ? 0 : getSpeedUpCost(building.level);
 
   const levelColor = hexToCSS(getParticleColor(building.level));
 
@@ -138,6 +155,28 @@ export function BuildingInfoSheet({ building, onClose }: BuildingInfoSheetProps)
               <span className={styles.statValue} style={{ textTransform: 'capitalize' }}>{def.tier}</span>
             </div>
           )}
+          {!isMaxLevel && cooldownDisplay && (
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>
+                {language === 'ru' ? 'Кулдаун' : 'Cooldown'}
+              </span>
+              <span className={styles.statValue}>{cooldownDisplay}</span>
+            </div>
+          )}
+          {def.bonus && (
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>
+                {language === 'ru' ? 'Бонус' : 'Bonus'}
+              </span>
+              <span className={styles.statValue}>
+                {Object.entries(def.bonus).map(([key, val]) => {
+                  if (typeof val === 'number') return `+${Math.round(val * 100)}% ${key.replace(/_/g, ' ')}`;
+                  if (typeof val === 'boolean') return key.replace(/_/g, ' ');
+                  return String(val);
+                }).join(', ')}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Upgrade Section */}
@@ -154,6 +193,14 @@ export function BuildingInfoSheet({ building, onClose }: BuildingInfoSheetProps)
               <Button variant="secondary" size="lg" fullWidth disabled>
                 {language === 'ru' ? 'Подождите...' : 'Wait...'}
               </Button>
+              {speedUpStars > 0 && (
+                <Button variant="primary" size="lg" fullWidth disabled>
+                  {language === 'ru'
+                    ? `Ускорить за ${speedUpStars} ⭐`
+                    : `Speed up for ${speedUpStars} ⭐`
+                  }
+                </Button>
+              )}
             </>
           ) : (
             <>

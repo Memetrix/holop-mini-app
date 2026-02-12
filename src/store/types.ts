@@ -37,6 +37,13 @@ export interface User {
   raidCooldownUntil: string | null;
   lastIncomeCollect: string;
   language: 'ru' | 'en';
+  lastDailyBonus: string | null;
+  dynamiteActive: boolean;
+  dynamiteUntil: string | null;
+  stoneWallCharges: number;
+  createdAt: string;
+  totalCoinsEarned: number;
+  totalGoldEarned: number;
 }
 
 // ─── Building ───
@@ -57,6 +64,11 @@ export interface Serf {
   goldPer30m: number;
   goldBonus: number;
   lastCollected: string;
+  ownerId: number;
+  capturedAt: string;
+  protectionType: string | null;
+  protectionUntil: string | null;
+  dailyIncome: number;
 }
 
 // ─── Equipment ───
@@ -92,6 +104,9 @@ export interface RaidTarget {
   maxHealth: number;
   hasIronDome: boolean;
   hasStoneWall: boolean;
+  stoneWallCharges: number;
+  isInvisible: boolean;
+  hasMoat: boolean;
 }
 
 // ─── Combat Log Entry ───
@@ -114,13 +129,55 @@ export interface BattleResult {
 }
 
 // ─── Cave State ───
-export type CaveType = 'dark' | 'glory';
+export type CaveType = 'dark' | 'glory' | 'reputation';
 
 // ─── Shop Item Status ───
 export interface ShopItemStatus {
   id: string;
   owned: boolean;
   equipped: boolean;
+}
+
+// ─── Inventory (owned items) ───
+export interface Inventory {
+  weapons: string[];       // owned weapon IDs
+  armor: string[];         // owned armor IDs
+  specials: InventoryItem[];  // Iron Dome, Stone Wall, Trebuchet, Frog Potion
+  defenses: InventoryItem[];  // Rov, Chastokol, Blagoslovenie, Nevidimost
+  potions: InventoryItem[];   // Eliksir Zhizni
+  explosives: InventoryItem[];// Bochka Porokha, Ognivo, Poroshkoviy Master
+  caveBoosters: InventoryItem[];
+}
+
+export interface InventoryItem {
+  id: string;
+  quantity: number;
+}
+
+// ─── Active Defenses (currently applied) ───
+export interface ActiveDefenses {
+  ironDome: { until: string } | null;
+  stoneWall: { until: string } | null;
+  blessing: { until: string } | null;
+  invisibility: { until: string } | null;
+  chastokol: { chargesLeft: number; until: string } | null;
+  moat: { chargesLeft: number } | null;
+}
+
+// ─── Active Cave Boosters ───
+export interface ActiveCaveBoosters {
+  healthPotion: boolean;    // +30 max HP
+  strengthPotion: boolean;  // +15 ATK
+  fortitudePotion: boolean; // +15 DEF
+  holyLight: boolean;       // -10% monster damage
+}
+
+// ─── Bank State ───
+export interface BankState {
+  unlocked: boolean;
+  depositedSilver: number;
+  depositedAt: string | null;
+  lastInterestClaim: string | null;
 }
 
 // ─── Daily Bonus ───
@@ -131,6 +188,38 @@ export interface DailyBonus {
   claimed: boolean;
 }
 
+// ─── Daily Bonus State ───
+export interface DailyBonusState {
+  currentStreak: number;
+  lastClaimed: string | null;
+  canClaim: boolean;
+  streakAction: 'too_early' | 'increment' | 'freeze' | 'rollback';
+  todayReward: { silver: number; gold: number; stars: number };
+}
+
+// ─── Cave Run ───
+export interface CaveRun {
+  id: number;
+  caveType: CaveType;
+  currentLevel: number;
+  playerHp: number;
+  playerMaxHp: number;
+  totalSilver: number;
+  totalGold: number;
+  itemsFound: string[];
+  status: 'active' | 'victory' | 'defeat' | 'exited';
+}
+
+// ─── Raid History (diminishing returns) ───
+export interface RaidHistory {
+  targetId: number;
+  raidedAt: string;
+  count: number;
+}
+
+// ─── Shop Category ───
+export type ShopCategory = 'weapons' | 'armor' | 'specials' | 'defense' | 'potions' | 'explosives' | 'boosters';
+
 // ─── Clan ───
 export interface Clan {
   id: string;
@@ -139,7 +228,11 @@ export interface Clan {
   maxMembers: number;
   totalPower: number;
   incomeBonus: number;
-  role: 'leader' | 'officer' | 'member';
+  role: 'leader' | 'officer' | 'member' | 'grand_prince' | 'voivode' | 'boyar' | 'druzhinnik';
+  treasury: number;
+  territories: string[];
+  rank: number | null;
+  warActive: boolean;
 }
 
 // ─── Toast Notification ───
@@ -164,9 +257,16 @@ export type ScreenId =
   | 'shop'
   | 'shop/weapons'
   | 'shop/armor'
+  | 'shop/specials'
+  | 'shop/defense'
+  | 'shop/potions'
+  | 'shop/explosives'
   | 'shop/boosters'
   | 'profile'
   | 'profile/serfs'
+  | 'profile/serfs/detail'
+  | 'profile/serfs/protect'
+  | 'profile/serfs/ransom'
   | 'profile/clan'
   | 'profile/bank'
   | 'profile/daily';

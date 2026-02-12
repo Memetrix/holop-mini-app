@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Screen } from '@/components/layout/Screen';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
 import { getAssetUrl } from '@/config/assets';
 import { getTitleByLevel } from '@/config/titles';
+import { getProfessionById } from '@/config/serfs';
 import { formatNumber } from '@/hooks/useFormatNumber';
 import { Button } from '@/components/ui/Button';
 import { BattleResultModal } from '@/components/game/BattleResultModal';
@@ -23,10 +24,12 @@ export function BattleScreen({ targetId, onBack }: BattleScreenProps) {
   const equipment = useGameStore((s) => s.equipment);
   const raidTargets = useGameStore((s) => s.raidTargets);
   const executeRaid = useGameStore((s) => s.executeRaid);
+  const addToast = useGameStore((s) => s.addToast);
   const haptics = useHaptics();
 
   const [phase, setPhase] = useState<BattlePhase>('pre');
   const [result, setResult] = useState<BattleResult | null>(null);
+  const serfToastFired = useRef(false);
 
   const target = raidTargets.find((t) => t.id === targetId);
 
@@ -46,7 +49,19 @@ export function BattleScreen({ targetId, onBack }: BattleScreenProps) {
 
   const handleCombatComplete = useCallback(() => {
     setPhase('done');
-  }, []);
+    // Show serf capture toast if applicable
+    if (result?.serfCaptured && !serfToastFired.current) {
+      serfToastFired.current = true;
+      const serf = result.serfCaptured;
+      const profession = getProfessionById(serf.professionId);
+      const profName = profession?.nameRu ?? serf.professionId;
+      addToast({
+        type: 'reward',
+        message: `Захвачен холоп: ${serf.name} (${profName})!`,
+        duration: 5000,
+      });
+    }
+  }, [result, addToast]);
 
   // Cleanup overflow on unmount
   useEffect(() => {

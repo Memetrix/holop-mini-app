@@ -8,7 +8,7 @@ import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useSwipeSheet } from '@/hooks/useSwipeSheet';
 import { getAssetUrl } from '@/config/assets';
-import { BUILDINGS } from '@/config/buildings';
+import { BUILDINGS, checkPrerequisites, getBuildingById } from '@/config/buildings';
 import { formatNumber } from '@/hooks/useFormatNumber';
 import { Button } from '@/components/ui/Button';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
@@ -60,9 +60,11 @@ export function BuildScreen({ onClose, targetSlotIndex }: BuildScreenProps) {
         ) : (
           <div className={styles.list}>
             {availableBuildings.map((def) => {
+              const prereqs = checkPrerequisites(def, buildings);
               const canAfford = user.silver >= def.baseCost;
+              const canBuild = canAfford && prereqs.met;
               return (
-                <div key={def.id} className={styles.card}>
+                <div key={def.id} className={`${styles.card} ${!prereqs.met ? styles.cardLocked : ''}`}>
                   <img
                     src={getAssetUrl(def.assetKey)}
                     alt={def.nameRu}
@@ -74,13 +76,21 @@ export function BuildScreen({ onClose, targetSlotIndex }: BuildScreenProps) {
                       +{formatNumber(def.baseIncome)}/ч • макс. ур. {def.maxLevel}
                     </span>
                     <span className={styles.tier}>{def.tier}</span>
+                    {!prereqs.met && (
+                      <span className={styles.prereq}>
+                        Нужно: {prereqs.missing.map((m) => {
+                          const req = getBuildingById(m.buildingId);
+                          return `${req?.nameRu ?? m.buildingId} ур.${m.requiredLevel}`;
+                        }).join(', ')}
+                      </span>
+                    )}
                   </div>
                   <div className={styles.action}>
                     <Button
                       variant="primary"
                       size="sm"
                       onClick={() => handleBuild(def.id)}
-                      disabled={!canAfford}
+                      disabled={!canBuild}
                     >
                       <CurrencyBadge type="silver" amount={def.baseCost} size="sm" />
                     </Button>

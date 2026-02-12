@@ -908,7 +908,7 @@ total_loot = base_loot * (1 + robin_hood)
   "BUILDING_MAX_LEVEL": 15,
   "BUILDING_SILVER_LEVELS": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
   "BUILDING_GOLD_LEVELS": [11, 12, 13, 14, 15],
-  "BUILDING_UPGRADE_COOLDOWN_MIN": 30,
+  "BUILDING_UPGRADE_COOLDOWNS": "per-level: L1:5m, L2:15m, L3:30m, L4:1h, L5:2h, L6:4h, L7:8h, L8:16h, L9:24h, L10:36h, L11:48h, L12:72h, L13:96h, L14:120h",
   "SERF_COLLECTION_INTERVAL_MIN": 30,
   "PVP_UNLOCK_TITLE": 6,
   "PVP_COOLDOWN_MIN": 1,
@@ -937,6 +937,27 @@ total_loot = base_loot * (1 + robin_hood)
 
 ---
 
+## Appendix C: TMA Implementation Status
+
+All game mechanics from the bot have been synced to the TMA frontend:
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Building system (4 categories) | Done | income/premium/gold/social, per-building costMult, incomeMult 1.25 |
+| Building prerequisites | Done | checkPrerequisites() in buildings.ts |
+| Per-level cooldowns | Done | 14 levels, L1:5min to L14:120h |
+| Gold upgrades (L11-15) | Done | tier-based gold costs |
+| Title rewards on rank-up | Done | silver + gold per rank |
+| Income collection (24h cap) | Done | health multiplier applied |
+| PvP Raids | Done | cooldown timer, diminishing returns, defense badges, serf capture |
+| Caves (PvE) | Done | cooldown, resurrection, cave boosters |
+| Shop (7 categories) | Done | weapons/armor/specials/defense/potions/explosives/boosters |
+| Daily Bonus (14-day cycle) | Done | streak logic, freeze/rollback/restore |
+| Serf management | Done | protection, ransom, gold collection |
+| Bank system | Done | deposit/withdraw/interest |
+| Clan UI | Done | placeholder, shows clan info |
+| Inventory system | Done | stackable items, equip/activate/use |
+
 > **Last updated**: 2026-02-12
-> **Version**: 1.0
-> **Status**: Season 1 -- "Великий Передел"
+> **Version**: 1.1
+> **Status**: Season 1 -- "Великий Передел" (all mechanics synced)

@@ -1,6 +1,7 @@
 /**
  * HOLOP Title / Rank System
  * 12 titles from Смерд (Serf) to Царь (Tsar)
+ * Synced with bot: github.com/VSemenchuk/holop (game_config.py TITLES)
  */
 
 export interface TitleDef {
@@ -14,7 +15,13 @@ export interface TitleDef {
   attackBonus: number;
   defenseBonus: number;
   lootBonus: number;
+  canAttack: boolean;
   assetKey: string;
+}
+
+export interface TitleReward {
+  coins: number;
+  gold: number;
 }
 
 export const TITLES: TitleDef[] = [
@@ -29,6 +36,7 @@ export const TITLES: TitleDef[] = [
     attackBonus: 0,
     defenseBonus: 0,
     lootBonus: 0,
+    canAttack: false,
     assetKey: 'titles/title_smerd',
   },
   {
@@ -42,6 +50,7 @@ export const TITLES: TitleDef[] = [
     attackBonus: 0,
     defenseBonus: 0,
     lootBonus: 0,
+    canAttack: false,
     assetKey: 'titles/title_holop',
   },
   {
@@ -55,6 +64,7 @@ export const TITLES: TitleDef[] = [
     attackBonus: 0,
     defenseBonus: 0,
     lootBonus: 0,
+    canAttack: false,
     assetKey: 'titles/title_chelyadin',
   },
   {
@@ -68,6 +78,7 @@ export const TITLES: TitleDef[] = [
     attackBonus: 0,
     defenseBonus: 0,
     lootBonus: 0,
+    canAttack: false,
     assetKey: 'titles/title_remeslennik',
   },
   {
@@ -81,6 +92,7 @@ export const TITLES: TitleDef[] = [
     attackBonus: 0,
     defenseBonus: 0,
     lootBonus: 0,
+    canAttack: false,
     assetKey: 'titles/title_posadsky',
   },
   {
@@ -93,7 +105,8 @@ export const TITLES: TitleDef[] = [
     specialUnlock: 'pvp',
     attackBonus: 0,
     defenseBonus: 0,
-    lootBonus: 0,
+    lootBonus: 0.10,
+    canAttack: true,
     assetKey: 'titles/title_kupets',
   },
   {
@@ -107,6 +120,7 @@ export const TITLES: TitleDef[] = [
     attackBonus: 0,
     defenseBonus: 0,
     lootBonus: 0.15,
+    canAttack: true,
     assetKey: 'titles/title_boyarin',
   },
   {
@@ -120,6 +134,7 @@ export const TITLES: TitleDef[] = [
     attackBonus: 0.20,
     defenseBonus: 0,
     lootBonus: 0,
+    canAttack: true,
     assetKey: 'titles/title_voevoda',
   },
   {
@@ -133,6 +148,7 @@ export const TITLES: TitleDef[] = [
     attackBonus: 0,
     defenseBonus: 0,
     lootBonus: 0,
+    canAttack: true,
     assetKey: 'titles/title_namestnik',
   },
   {
@@ -146,6 +162,7 @@ export const TITLES: TitleDef[] = [
     attackBonus: 0.30,
     defenseBonus: 0.30,
     lootBonus: 0,
+    canAttack: true,
     assetKey: 'titles/title_knyaz',
   },
   {
@@ -159,6 +176,7 @@ export const TITLES: TitleDef[] = [
     attackBonus: 0,
     defenseBonus: 0,
     lootBonus: 0,
+    canAttack: true,
     assetKey: 'titles/title_veliky_knyaz',
   },
   {
@@ -172,9 +190,33 @@ export const TITLES: TitleDef[] = [
     attackBonus: 0,
     defenseBonus: 0,
     lootBonus: 0,
+    canAttack: true,
     assetKey: 'titles/title_tsar',
   },
 ];
+
+// ═══════════════════════════════════════
+// TITLE REWARDS — coins + gold for rank up
+// Synced with bot: TITLE_REWARDS
+// ═══════════════════════════════════════
+
+export const TITLE_REWARDS: Record<number, TitleReward> = {
+  2:  { coins: 150,   gold: 0 },
+  3:  { coins: 300,   gold: 5 },
+  4:  { coins: 500,   gold: 10 },
+  5:  { coins: 800,   gold: 15 },
+  6:  { coins: 1500,  gold: 30 },
+  7:  { coins: 2500,  gold: 50 },
+  8:  { coins: 4000,  gold: 75 },
+  9:  { coins: 6000,  gold: 100 },
+  10: { coins: 10000, gold: 150 },
+  11: { coins: 20000, gold: 250 },
+  12: { coins: 50000, gold: 500 },
+};
+
+// ═══════════════════════════════════════
+// HELPER FUNCTIONS
+// ═══════════════════════════════════════
 
 /** Get title definition by level */
 export function getTitleByLevel(level: number): TitleDef {
@@ -185,6 +227,11 @@ export function getTitleByLevel(level: number): TitleDef {
 export function getNextTitle(currentLevel: number): TitleDef | null {
   if (currentLevel >= 12) return null;
   return TITLES[currentLevel]; // 0-indexed, so currentLevel gives next
+}
+
+/** Get reward for reaching a given title level (or null if no reward) */
+export function getTitleReward(level: number): TitleReward | null {
+  return TITLE_REWARDS[level] ?? null;
 }
 
 /** Calculate progress percentage to next title */
@@ -210,4 +257,10 @@ export function getTotalDefenseBonus(titleLevel: number): number {
   return TITLES
     .filter(t => t.level <= titleLevel)
     .reduce((sum, t) => sum + t.defenseBonus, 0);
+}
+
+/** Check if a title level can attack other players */
+export function canAttackAtTitle(titleLevel: number): boolean {
+  const title = getTitleByLevel(titleLevel);
+  return title.canAttack;
 }
