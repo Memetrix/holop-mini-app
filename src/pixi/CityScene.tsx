@@ -408,36 +408,159 @@ export function CityScene({ width, height, onSlotTap }: CitySceneProps) {
     }
 
     function drawTerrain() {
+      // ─── 1. Ground base ───
       const bg = new Graphics();
       bg.rect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-      bg.fill({ color: 0x120A04 });
+      bg.fill({ color: 0x1A120A });
       backgroundLayer.addChild(bg);
 
-      // Dirt paths between connected islands
-      const paths = new Graphics();
+      // ─── 2. Large terrain patches (fields, forests, marshes) ───
+      const patches = new Graphics();
+      const patchData = [
+        // Fields (lighter earth / plowed)
+        { cx: 120, cy: 250, rx: 140, ry: 90, color: 0x2A1E10, alpha: 0.35, seed: 10 },
+        { cx: 650, cy: 200, rx: 110, ry: 70, color: 0x2A1E10, alpha: 0.30, seed: 20 },
+        { cx: 400, cy: 600, rx: 160, ry: 100, color: 0x251A0D, alpha: 0.25, seed: 30 },
+        { cx: 180, cy: 750, rx: 130, ry: 80, color: 0x2A1E10, alpha: 0.28, seed: 40 },
+        { cx: 700, cy: 750, rx: 120, ry: 95, color: 0x251A0D, alpha: 0.30, seed: 50 },
+        { cx: 350, cy: 950, rx: 170, ry: 110, color: 0x2A1E10, alpha: 0.22, seed: 60 },
+        // Dark forest zones
+        { cx: 80,  cy: 500, rx: 90,  ry: 120, color: 0x1A2B10, alpha: 0.25, seed: 70 },
+        { cx: 800, cy: 400, rx: 85,  ry: 130, color: 0x1A2B10, alpha: 0.22, seed: 80 },
+        { cx: 100, cy: 1000, rx: 95, ry: 100, color: 0x162510, alpha: 0.28, seed: 90 },
+        { cx: 750, cy: 1100, rx: 100, ry: 90,  color: 0x162510, alpha: 0.20, seed: 95 },
+      ];
+      for (const p of patchData) {
+        const pts = generateSmoothBlob(p.cx, p.cy, (p.rx + p.ry) / 2, p.seed, p.ry / p.rx, 0, 10);
+        drawSmoothClosedCurve(patches, pts);
+        patches.fill({ color: p.color, alpha: p.alpha });
+      }
+      backgroundLayer.addChild(patches);
+
+      // ─── 3. River / stream ───
+      const river = new Graphics();
+      // Main river flowing from top-left to bottom-right
+      river.moveTo(0, 380);
+      river.bezierCurveTo(120, 350, 200, 420, 320, 400);
+      river.bezierCurveTo(430, 380, 480, 440, 550, 460);
+      river.bezierCurveTo(650, 490, 750, 470, 900, 520);
+      river.stroke({ color: 0x1A2A3A, width: 18, alpha: 0.18 });
+      // Same path, thinner highlight
+      river.moveTo(0, 380);
+      river.bezierCurveTo(120, 350, 200, 420, 320, 400);
+      river.bezierCurveTo(430, 380, 480, 440, 550, 460);
+      river.bezierCurveTo(650, 490, 750, 470, 900, 520);
+      river.stroke({ color: 0x253545, width: 8, alpha: 0.15 });
+      // Branch stream
+      river.moveTo(320, 400);
+      river.bezierCurveTo(340, 500, 280, 600, 300, 720);
+      river.bezierCurveTo(310, 800, 350, 900, 380, 1000);
+      river.stroke({ color: 0x1A2A3A, width: 10, alpha: 0.14 });
+      river.moveTo(320, 400);
+      river.bezierCurveTo(340, 500, 280, 600, 300, 720);
+      river.bezierCurveTo(310, 800, 350, 900, 380, 1000);
+      river.stroke({ color: 0x253545, width: 4, alpha: 0.12 });
+      backgroundLayer.addChild(river);
+
+      // ─── 4. Dirt roads between islands (wider, textured) ───
+      const roads = new Graphics();
       for (const [a, b] of ISLAND_PATHS) {
         const sa = CITY_SLOTS[a];
         const sb = CITY_SLOTS[b];
         if (!sa || !sb) continue;
-        const mx = (sa.x + sb.x) / 2 + (Math.sin(a + b) * 20);
-        const my = (sa.y + sb.y) / 2 + (Math.cos(a * b) * 15);
-        paths.moveTo(sa.x, sa.y);
-        paths.quadraticCurveTo(mx, my, sb.x, sb.y);
+        const mx = (sa.x + sb.x) / 2 + Math.sin(a + b) * 25;
+        const my = (sa.y + sb.y) / 2 + Math.cos(a * b) * 18;
+        // Road shadow
+        roads.moveTo(sa.x, sa.y);
+        roads.quadraticCurveTo(mx, my + 2, sb.x, sb.y);
+        roads.stroke({ color: 0x000000, width: 12, alpha: 0.08 });
+        // Road body
+        roads.moveTo(sa.x, sa.y);
+        roads.quadraticCurveTo(mx, my, sb.x, sb.y);
+        roads.stroke({ color: 0x3A2D1A, width: 8, alpha: 0.35 });
+        // Road edges (lighter)
+        roads.moveTo(sa.x, sa.y);
+        roads.quadraticCurveTo(mx, my, sb.x, sb.y);
+        roads.stroke({ color: 0x4A3D2A, width: 10, alpha: 0.08 });
       }
-      paths.stroke({ color: 0x2A1F12, width: 6, alpha: 0.25 });
-      backgroundLayer.addChild(paths);
+      backgroundLayer.addChild(roads);
 
-      // Scatter decorative grass dots
-      const dots = new Graphics();
-      const rng = seededRandom(42);
-      for (let i = 0; i < 200; i++) {
-        const x = rng() * WORLD_WIDTH;
-        const y = rng() * WORLD_HEIGHT;
-        const r = 1 + rng() * 2.5;
-        dots.circle(x, y, r);
-        dots.fill({ color: 0x2D3B1A, alpha: 0.08 + rng() * 0.06 });
+      // ─── 5. Scattered trees (small groups near forest zones) ───
+      const trees = new Graphics();
+      const treeRng = seededRandom(333);
+      for (let i = 0; i < 120; i++) {
+        const x = treeRng() * WORLD_WIDTH;
+        const y = treeRng() * WORLD_HEIGHT;
+        // Skip if too close to any island center
+        let tooClose = false;
+        for (const s of CITY_SLOTS) {
+          const dx = x - s.x, dy = y - s.y;
+          if (Math.sqrt(dx * dx + dy * dy) < ISLAND_RADIUS * s.scale + 20) {
+            tooClose = true;
+            break;
+          }
+        }
+        if (tooClose) continue;
+        const size = 3 + treeRng() * 5;
+        const shade = treeRng();
+        // Tree crown
+        trees.circle(x, y, size);
+        trees.fill({
+          color: shade < 0.5 ? 0x1E3012 : 0x2B3B18,
+          alpha: 0.18 + treeRng() * 0.12,
+        });
+        // Darker center
+        trees.circle(x, y - 1, size * 0.5);
+        trees.fill({ color: 0x142408, alpha: 0.12 });
       }
-      backgroundLayer.addChild(dots);
+      backgroundLayer.addChild(trees);
+
+      // ─── 6. Grass tufts ───
+      const grass = new Graphics();
+      const grassRng = seededRandom(42);
+      for (let i = 0; i < 300; i++) {
+        const x = grassRng() * WORLD_WIDTH;
+        const y = grassRng() * WORLD_HEIGHT;
+        const r = 1 + grassRng() * 2;
+        grass.circle(x, y, r);
+        grass.fill({ color: 0x2D3B1A, alpha: 0.06 + grassRng() * 0.06 });
+      }
+      backgroundLayer.addChild(grass);
+
+      // ─── 7. Field furrow lines (in field patches) ───
+      const furrows = new Graphics();
+      const furrowFields = [
+        { cx: 120, cy: 250, rx: 120, ry: 70 },
+        { cx: 650, cy: 200, rx: 90, ry: 55 },
+        { cx: 400, cy: 600, rx: 130, ry: 80 },
+      ];
+      for (const field of furrowFields) {
+        for (let row = -field.ry + 8; row < field.ry; row += 12) {
+          const startX = field.cx - field.rx * 0.8;
+          const endX = field.cx + field.rx * 0.8;
+          furrows.moveTo(startX, field.cy + row);
+          furrows.lineTo(endX, field.cy + row + 3);
+          furrows.stroke({ color: 0x352810, width: 1, alpha: 0.08 });
+        }
+      }
+      backgroundLayer.addChild(furrows);
+
+      // ─── 8. Subtle fog / atmosphere patches ───
+      const fog = new Graphics();
+      const fogPatches = [
+        { x: 200, y: 400, r: 180 },
+        { x: 600, y: 700, r: 200 },
+        { x: 400, y: 1100, r: 160 },
+        { x: 100, y: 900, r: 140 },
+        { x: 750, y: 300, r: 150 },
+      ];
+      for (const f of fogPatches) {
+        for (let ring = 3; ring >= 1; ring--) {
+          fog.circle(f.x, f.y, f.r * (ring / 3));
+          fog.fill({ color: 0x1A1A1A, alpha: 0.015 * (1 - ring / 4) });
+        }
+      }
+      backgroundLayer.addChild(fog);
     }
 
     async function drawIslandsAndBuildings() {
