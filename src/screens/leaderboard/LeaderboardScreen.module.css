@@ -1,0 +1,157 @@
+/* ─── Leaderboard Screen — matches bot §12 Рейтинги ─── */
+
+.header {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.screenTitle {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--gold-light);
+}
+
+/* ─── Tab Bar ─── */
+
+.tabBar {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tabBar::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px) saturate(1.6);
+  -webkit-backdrop-filter: blur(12px) saturate(1.6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.tabActive {
+  border-color: var(--gold);
+  color: var(--gold-light);
+  background: rgba(200, 151, 62, 0.1);
+}
+
+.tabLabel {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* ─── List Card ─── */
+
+.listCard {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.listTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--gold-light);
+  margin-bottom: var(--space-3);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px var(--space-3);
+  border-radius: var(--radius-sm);
+  transition: background 150ms ease;
+}
+
+.row:nth-child(odd) {
+  background: rgba(42, 31, 18, 0.3);
+}
+
+.rowMe {
+  background: rgba(200, 151, 62, 0.12) !important;
+  border: 1px solid rgba(200, 151, 62, 0.25);
+}
+
+.rank {
+  width: 36px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--parchment);
+  flex-shrink: 0;
+}
+
+.playerInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.playerName {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--parchment);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerCity {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ─── My Rank ─── */
+
+.myRank {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px var(--space-3);
+  margin-top: var(--space-3);
+  border-top: 1px solid var(--glass-border);
+  background: rgba(200, 151, 62, 0.08);
+  border-radius: var(--radius-sm);
+}

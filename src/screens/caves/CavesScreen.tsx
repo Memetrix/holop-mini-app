@@ -18,9 +18,9 @@ function formatCountdown(targetTime: string): string {
   const hours = Math.floor(diff / (1000 * 60 * 60));
   const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   const secs = Math.floor((diff % (1000 * 60)) / 1000);
-  if (hours > 0) return `${hours}ч ${mins}м`;
-  if (mins > 0) return `${mins}м ${secs}с`;
-  return `${secs}с`;
+  if (hours > 0) return `${hours}h ${mins}m`;
+  if (mins > 0) return `${mins}m ${secs}s`;
+  return `${secs}s`;
 }
 
 export function CavesScreen() {
@@ -31,6 +31,7 @@ export function CavesScreen() {
   const buyItem = useGameStore((s) => s.buyItem);
   const activeCaveBoosters = useGameStore((s) => s.activeCaveBoosters);
   const inventory = useGameStore((s) => s.inventory);
+  const language = useGameStore((s) => s.user.language);
   const haptics = useHaptics();
 
   const [lootRewards, setLootRewards] = useState<LootReward[] | null>(null);
@@ -57,10 +58,10 @@ export function CavesScreen() {
     if (result.won) {
       haptics.success();
       const rewards: LootReward[] = [];
-      if (result.silverLooted > 0) rewards.push({ type: 'silver', amount: result.silverLooted, label: `+${result.silverLooted} серебра` });
-      if (result.goldLooted > 0) rewards.push({ type: 'gold', amount: result.goldLooted, label: `+${result.goldLooted} золота` });
-      if (result.reputationGained > 0) rewards.push({ type: 'stars', amount: result.reputationGained, label: `+${result.reputationGained} репутации` });
-      setLootRewards(rewards.length > 0 ? rewards : [{ type: 'silver', amount: 0, label: 'Ничего не найдено' }]);
+      if (result.silverLooted > 0) rewards.push({ type: 'silver', amount: result.silverLooted, label: `+${result.silverLooted} ${language === 'ru' ? 'серебра' : 'silver'}` });
+      if (result.goldLooted > 0) rewards.push({ type: 'gold', amount: result.goldLooted, label: `+${result.goldLooted} ${language === 'ru' ? 'золота' : 'gold'}` });
+      if (result.reputationGained > 0) rewards.push({ type: 'stars', amount: result.reputationGained, label: `+${result.reputationGained} ${language === 'ru' ? 'репутации' : 'reputation'}` });
+      setLootRewards(rewards.length > 0 ? rewards : [{ type: 'silver', amount: 0, label: language === 'ru' ? 'Ничего не найдено' : 'Nothing found' }]);
     } else {
       haptics.error();
       setDefeatMonsterLevel(monsterLevel);
@@ -96,11 +97,11 @@ export function CavesScreen() {
   if (activeCaveBoosters.healthPotion) activeBoosterLabels.push('+30 HP');
   if (activeCaveBoosters.strengthPotion) activeBoosterLabels.push('+15 ATK');
   if (activeCaveBoosters.fortitudePotion) activeBoosterLabels.push('+15 DEF');
-  if (activeCaveBoosters.holyLight) activeBoosterLabels.push('-10% урона');
+  if (activeCaveBoosters.holyLight) activeBoosterLabels.push(language === 'ru' ? '-10% урона' : '-10% dmg');
 
   return (
     <Screen>
-      <h2 style={{ fontFamily: 'var(--font-display)', color: 'var(--gold-light)', marginBottom: 'var(--space-4)' }}>Пещеры</h2>
+      <h2 style={{ fontFamily: 'var(--font-display)', color: 'var(--gold-light)', marginBottom: 'var(--space-4)' }}>{language === 'ru' ? 'Пещеры' : 'Caves'}</h2>
 
       {/* Cooldown Banner */}
       {isOnCooldown && (
@@ -108,7 +109,7 @@ export function CavesScreen() {
           background: 'rgba(200,151,62,0.1)', border: '1px solid var(--border)',
           borderRadius: 12, padding: '12px 16px', marginBottom: 16, textAlign: 'center',
         }}>
-          <span style={{ color: 'var(--gold)', fontWeight: 600 }}>Кулдаун: {cooldownText}</span>
+          <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{language === 'ru' ? 'Кулдаун' : 'Cooldown'}: {cooldownText}</span>
         </div>
       )}
 
@@ -117,10 +118,10 @@ export function CavesScreen() {
         background: 'var(--bg-card)', borderRadius: 12, padding: 12, marginBottom: 16,
         border: '1px solid var(--border)',
       }}>
-        <h4 style={{ color: 'var(--gold-light)', marginBottom: 8, fontSize: 14 }}>Бустеры</h4>
+        <h4 style={{ color: 'var(--gold-light)', marginBottom: 8, fontSize: 14 }}>{language === 'ru' ? 'Бустеры' : 'Boosters'}</h4>
         {activeBoosterLabels.length > 0 && (
           <div style={{ color: '#4CAF50', fontSize: 12, marginBottom: 8 }}>
-            Активно: {activeBoosterLabels.join(', ')}
+            {language === 'ru' ? 'Активно' : 'Active'}: {activeBoosterLabels.join(', ')}
           </div>
         )}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -139,15 +140,15 @@ export function CavesScreen() {
                 borderRadius: 8, padding: '8px 10px', fontSize: 12,
                 border: isActive ? '1px solid #4CAF50' : '1px solid var(--border)',
               }}>
-                <div style={{ fontWeight: 600, color: 'var(--parchment)' }}>{b.nameRu}</div>
-                <div style={{ color: 'var(--parchment-dark)', fontSize: 11 }}>{b.effect}</div>
+                <div style={{ fontWeight: 600, color: 'var(--parchment)' }}>{language === 'ru' ? b.nameRu : (b.nameEn ?? b.nameRu)}</div>
+                <div style={{ color: 'var(--parchment-dark)', fontSize: 11 }}>{language === 'ru' ? b.effect : (b.effectEn ?? b.effect)}</div>
                 <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
                   {qty > 0 && !isActive && (
                     <Button variant="ghost" size="sm" onClick={() => handleUseBooster(b.id)} style={{ fontSize: 11, padding: '2px 8px' }}>
-                      Исп. ({qty})
+                      {language === 'ru' ? `Исп. (${qty})` : `Use (${qty})`}
                     </Button>
                   )}
-                  {isActive && <span style={{ color: '#4CAF50', fontSize: 11 }}>Активен</span>}
+                  {isActive && <span style={{ color: '#4CAF50', fontSize: 11 }}>{language === 'ru' ? 'Активен' : 'Active'}</span>}
                   {qty === 0 && !isActive && (
                     <Button variant="ghost" size="sm" onClick={() => handleBuyBooster(b.id)} style={{ fontSize: 11, padding: '2px 8px' }}>
                       {b.cost} ⭐
@@ -165,8 +166,8 @@ export function CavesScreen() {
         <div className={styles.caveHeader}>
           <img src={getAssetUrl('ui_caves/ui_dark_cave')} alt="" className={styles.caveIcon} />
           <div>
-            <h3>Тёмная пещера</h3>
-            <span className={styles.caveSubtitle}>{darkCaveUnlocked ? 'Доступна' : 'Титул 3 (Челядин)'}</span>
+            <h3>{language === 'ru' ? 'Тёмная пещера' : 'Dark Cave'}</h3>
+            <span className={styles.caveSubtitle}>{darkCaveUnlocked ? (language === 'ru' ? 'Доступна' : 'Available') : (language === 'ru' ? 'Титул 3 (Челядин)' : 'Title 3 (Serf)')}</span>
           </div>
         </div>
 
@@ -190,7 +191,7 @@ export function CavesScreen() {
                   onClick={() => handleFight(monster.id, monster.level)}
                   disabled={isOnCooldown || user.health < 10}
                 >
-                  {isOnCooldown ? cooldownText : 'Бой'}
+                  {isOnCooldown ? cooldownText : (language === 'ru' ? 'Бой' : 'Fight')}
                 </Button>
               </div>
             ))}
@@ -203,8 +204,8 @@ export function CavesScreen() {
         <div className={styles.caveHeader}>
           <img src={getAssetUrl('ui_caves/ui_glory_cave')} alt="" className={styles.caveIcon} />
           <div>
-            <h3>Пещера славы</h3>
-            <span className={styles.caveSubtitle}>{gloryCaveUnlocked ? 'Доступна' : 'Титул 4 (Ремесленник)'}</span>
+            <h3>{language === 'ru' ? 'Пещера славы' : 'Glory Cave'}</h3>
+            <span className={styles.caveSubtitle}>{gloryCaveUnlocked ? (language === 'ru' ? 'Доступна' : 'Available') : (language === 'ru' ? 'Титул 4 (Ремесленник)' : 'Title 4 (Craftsman)')}</span>
           </div>
         </div>
 
@@ -228,7 +229,7 @@ export function CavesScreen() {
                   onClick={() => handleFight(monster.id, monster.level)}
                   disabled={isOnCooldown || user.health < 10}
                 >
-                  {isOnCooldown ? cooldownText : 'Бой'}
+                  {isOnCooldown ? cooldownText : (language === 'ru' ? 'Бой' : 'Fight')}
                 </Button>
               </div>
             ))}
@@ -242,16 +243,16 @@ export function CavesScreen() {
           position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(26,16,8,0.95)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24,
         }}>
-          <h2 style={{ color: '#ff6b6b', fontFamily: 'var(--font-display)', marginBottom: 12 }}>Поражение!</h2>
+          <h2 style={{ color: '#ff6b6b', fontFamily: 'var(--font-display)', marginBottom: 12 }}>{language === 'ru' ? 'Поражение!' : 'Defeat!'}</h2>
           <p style={{ color: 'var(--parchment-dark)', textAlign: 'center', marginBottom: 24 }}>
-            Ваш персонаж пал в бою. Можно воскреситься или вернуться.
+            {language === 'ru' ? 'Ваш персонаж пал в бою. Можно воскреситься или вернуться.' : 'Your character fell in battle. You can resurrect or go back.'}
           </p>
           <div style={{ display: 'flex', gap: 12, flexDirection: 'column', width: '100%', maxWidth: 280 }}>
             <Button variant="primary" size="lg" fullWidth onClick={handleResurrect}>
-              Воскреситься ({GAME.CAVE_RESURRECTION_BASE_STARS + GAME.CAVE_RESURRECTION_PER_LEVEL_STARS * defeatMonsterLevel} ⭐)
+              {language === 'ru' ? 'Воскреситься' : 'Resurrect'} ({GAME.CAVE_RESURRECTION_BASE_STARS + GAME.CAVE_RESURRECTION_PER_LEVEL_STARS * defeatMonsterLevel} ⭐)
             </Button>
             <Button variant="ghost" size="md" fullWidth onClick={() => setDefeatMonsterLevel(null)}>
-              Вернуться
+              {language === 'ru' ? 'Вернуться' : 'Go Back'}
             </Button>
           </div>
         </div>

@@ -171,3 +171,159 @@
   color: #e6a028;
   border: 1px solid rgba(230, 160, 40, 0.35);
 }
+
+/* ─── Header Actions ─── */
+
+.headerActions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+/* ─── Bochka Catalog ─── */
+
+.bochkaInfo {
+  background: rgba(220, 60, 60, 0.08);
+  border: 1px solid rgba(220, 60, 60, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.bochkaInfo p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: var(--space-2);
+}
+
+.bochkaCost {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold-light);
+}
+
+.bochkaControls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.bochkaSearchInput {
+  width: 100%;
+  background: rgba(42, 31, 18, 0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--parchment);
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.bochkaSearchInput::placeholder { color: var(--text-muted); }
+.bochkaSearchInput:focus { border-color: var(--gold-dark); }
+
+.sortBtns {
+  display: flex;
+  gap: 4px;
+}
+
+.sortBtn {
+  flex: 1;
+  background: rgba(42, 31, 18, 0.5);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 4px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 150ms ease;
+  text-align: center;
+}
+
+.sortActive {
+  background: rgba(200, 151, 62, 0.15);
+  border-color: var(--gold-dark);
+  color: var(--gold-light);
+}
+
+.sortBtn:active { background: rgba(200, 151, 62, 0.2); }
+
+.targetExploded {
+  opacity: 0.5;
+}
+
+.plantBtn {
+  background: rgba(220, 60, 60, 0.15);
+  border: 1px solid rgba(220, 60, 60, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  color: #e05555;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.plantBtn:active:not(:disabled) {
+  background: rgba(220, 60, 60, 0.3);
+}
+
+.plantBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  color: var(--text-muted);
+  background: rgba(42, 31, 18, 0.3);
+  border-color: var(--glass-border);
+}
+
+/* ─── Defuse Info ─── */
+
+.bochkaDefuseInfo {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.bochkaDefuseInfo h4 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--gold-light);
+  margin-bottom: var(--space-2);
+}
+
+.defuseRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+  color: var(--parchment);
+  padding: 4px 0;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.defuseRow:last-child { border-bottom: none; }
+
+.defuseChance {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.defuseCost {
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 60px;
+  text-align: right;
+}

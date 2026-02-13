@@ -151,6 +151,26 @@ export const SERF_RANSOM_CONFIG = {
 } as const;
 
 // ---------------------------------------------------------------------------
+// SPR Gold Income Config  (bot SPR_CONFIG)
+// ---------------------------------------------------------------------------
+
+export const SPR_CONFIG = {
+  goldBase: 3,            // Base gold per 30min interval
+  goldPerSpr: 50,         // SPR divisor: spr / 50 = extra gold
+  levelIncomeBonus: 0.10, // +10% per serf level
+  freedomBonus: 0.15,     // +15% if player is free (no master)
+} as const;
+
+// ---------------------------------------------------------------------------
+// Slot Cost Config  (bot SERF_SLOT_COSTS)
+// ---------------------------------------------------------------------------
+
+export const SERF_SLOT_CONFIG = {
+  firstSlotCostStars: 10,   // 90% discount on first slot purchase
+  normalSlotCostStars: 100, // Subsequent slot purchases
+} as const;
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -170,7 +190,40 @@ export function getProfessionById(id: string): SerfProfessionDef | undefined {
 }
 
 /**
- * Calculate ransom price in silver.
+ * Calculate serf gold income per 30-minute interval.
+ * Formula (synced with bot calculate_serf_gold_income):
+ *   gold_per_30m = (goldBase + spr/goldPerSpr) × (1 + profBonus) × (1 + level × levelIncomeBonus)
+ */
+export function calculateSerfGoldPer30m(
+  spr: number,
+  professionId: string,
+  level: number,
+): number {
+  const cfg = SPR_CONFIG;
+  const prof = getProfessionById(professionId);
+  const profBonus = prof?.goldBonus ?? 0;
+
+  const fromBase = cfg.goldBase;
+  const fromSpr = spr / cfg.goldPerSpr;
+  const profMult = 1 + profBonus;
+  const levelMult = 1 + level * cfg.levelIncomeBonus;
+
+  return Math.floor((fromBase + fromSpr) * profMult * levelMult);
+}
+
+/**
+ * Calculate daily gold income from a serf (48 intervals per day).
+ */
+export function calculateSerfDailyIncome(
+  spr: number,
+  professionId: string,
+  level: number,
+): number {
+  return calculateSerfGoldPer30m(spr, professionId, level) * 48;
+}
+
+/**
+ * Calculate ransom price in silver equivalent.
  * Formula: dailyIncome * baseMultiplier * (1 + min(timeBonusPerDay * daysOwned, timeBonusMax))
  * Clamped to minPriceSilver.
  */
@@ -180,4 +233,78 @@ export function calculateRansomPrice(dailyIncome: number, hoursOwned: number): n
   const timeBonus = Math.min(cfg.timeBonusPerDay * daysOwned, cfg.timeBonusMax);
   const price = dailyIncome * cfg.baseMultiplier * (1 + timeBonus);
   return Math.max(Math.round(price), cfg.minPriceSilver);
+}
+
+/**
+ * Calculate ransom price with multi-currency conversion.
+ * Bot logic: <15k silver → silver, 15k-100k → gold (÷100), >100k → stars (÷2000)
+ */
+export function calculateRansomPriceMultiCurrency(
+  dailyIncome: number,
+  hoursOwned: number,
+): { amount: number; currency: 'silver' | 'gold' | 'stars'; silverEquivalent: number } {
+  const cfg = SERF_RANSOM_CONFIG;
+  const silverPrice = calculateRansomPrice(dailyIncome, hoursOwned);
+
+  if (silverPrice >= cfg.starsThreshold) {
+    return {
+      amount: Math.ceil(silverPrice / cfg.silverToStars),
+      currency: 'stars',
+      silverEquivalent: silverPrice,
+    };
+  }
+  if (silverPrice >= cfg.goldThreshold) {
+    return {
+      amount: Math.ceil(silverPrice / cfg.silverToGold),
+      currency: 'gold',
+      silverEquivalent: silverPrice,
+    };
+  }
+  return {
+    amount: silverPrice,
+    currency: 'silver',
+    silverEquivalent: silverPrice,
+  };
+}
+
+/**
+ * Get the cost to buy the next serf slot (in stars).
+ * First purchase is discounted (10⭐), subsequent are 100⭐.
+ */
+export function getSlotPurchaseCost(slotsPurchased: number): number {
+  if (slotsPurchased === 0) return SERF_SLOT_CONFIG.firstSlotCostStars;
+  return SERF_SLOT_CONFIG.normalSlotCostStars;
+}
+
+/**
+ * Calculate total serf bonuses from all owned serfs.
+ * Returns aggregate bonuses from profession otherBonus fields.
+ */
+export function calculateSerfBonuses(serfs: { professionId: string }[]): {
+  attackBonus: number;
+  incomeBonus: number;
+  buildSpeedBonus: number;
+  hasDailyScout: boolean;
+  captureImmunityHours: number;
+} {
+  let attackBonus = 0;
+  let incomeBonus = 0;
+  let buildSpeedBonus = 0;
+  let hasDailyScout = false;
+  let captureImmunityHours = 0;
+
+  for (const serf of serfs) {
+    const prof = getProfessionById(serf.professionId);
+    if (!prof?.otherBonus) continue;
+    const b = prof.otherBonus;
+    if (b.attack_bonus) attackBonus += b.attack_bonus;
+    if (b.income_bonus) incomeBonus += b.income_bonus;
+    if (b.build_speed) buildSpeedBonus += b.build_speed;
+    if (b.daily_scout) hasDailyScout = true;
+    if (b.capture_immunity_hours) {
+      captureImmunityHours = Math.max(captureImmunityHours, b.capture_immunity_hours);
+    }
+  }
+
+  return { attackBonus, incomeBonus, buildSpeedBonus, hasDailyScout, captureImmunityHours };
 }

@@ -255,7 +255,128 @@
   white-space: nowrap;
 }
 
+/* ─── Hub Banner ─── */
+
+.hubBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.hubAvatar {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.hubPlayerInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.hubName {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--gold-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hubTitle {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.hubIncome {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.hubIncomeValue {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.hubIncomeLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ─── Navigation Grid ─── */
+
+.navGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.navBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px) saturate(1.6);
+  -webkit-backdrop-filter: blur(12px) saturate(1.6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-2);
+  color: var(--parchment);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.navBtn:active {
+  background: rgba(200, 151, 62, 0.15);
+}
+
+.navIcon {
+  font-size: 22px;
+}
+
+.navLabel {
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
 /* ─── Clan ─── */
+
+.clanCard {
+  display: block;
+  width: 100%;
+  background: rgba(42, 31, 18, 0.4);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  cursor: pointer;
+  transition: background 150ms ease;
+  font-family: inherit;
+  color: inherit;
+}
+
+.clanCard:active {
+  background: rgba(200, 151, 62, 0.1);
+}
 
 .clanInfo {
   text-align: center;

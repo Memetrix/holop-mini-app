@@ -28,13 +28,47 @@ function formatCooldown(totalSeconds: number): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
+// ─── Bochka Catalog Mock Data ───
+
+interface BochkaTarget {
+  id: number;
+  username: string;
+  cityName: string;
+  titleLevel: number;
+  silver: number;
+  isExploded: boolean;
+  recoveryAt?: string;
+  isMined: boolean; // already has a bochka planted
+  clanName?: string;
+}
+
+const MOCK_BOCHKA_TARGETS: BochkaTarget[] = [
+  { id: 201, username: 'knyaz_oleg', cityName: 'Новгород', titleLevel: 9, silver: 450000, isExploded: false, isMined: false, clanName: 'Волки' },
+  { id: 202, username: 'boyarin_petr', cityName: 'Суздаль', titleLevel: 8, silver: 320000, isExploded: false, isMined: false },
+  { id: 203, username: 'voevoda_dmitriy', cityName: 'Тверь', titleLevel: 10, silver: 680000, isExploded: false, isMined: true },
+  { id: 204, username: 'kupets_nikolay', cityName: 'Псков', titleLevel: 7, silver: 180000, isExploded: true, recoveryAt: '2026-02-14T12:00:00Z', isMined: false },
+  { id: 205, username: 'starets_aleksiy', cityName: 'Рязань', titleLevel: 6, silver: 95000, isExploded: false, isMined: false },
+  { id: 206, username: 'druzhina_vasya', cityName: 'Владимир', titleLevel: 8, silver: 270000, isExploded: false, isMined: false, clanName: 'Орда' },
+  { id: 207, username: 'smerd_fedka', cityName: 'Ростов', titleLevel: 7, silver: 150000, isExploded: false, isMined: false },
+  { id: 208, username: 'krestyanin_ivan', cityName: 'Ярославль', titleLevel: 6, silver: 75000, isExploded: false, isMined: false },
+];
+
+type BochkaSort = 'level_desc' | 'level_asc' | 'silver_desc' | 'silver_asc';
+
+type RaidView = 'targets' | 'bochka';
+
 export function RaidsScreen() {
   const raidTargets = useGameStore((s) => s.raidTargets);
   const user = useGameStore((s) => s.user);
   const raidHistory = useGameStore((s) => s.raidHistory);
   const refreshTargets = useGameStore((s) => s.refreshRaidTargets);
+  const addToast = useGameStore((s) => s.addToast);
+  const language = useGameStore((s) => s.user.language);
   const [battleTargetId, setBattleTargetId] = useState<number | null>(null);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const [view, setView] = useState<RaidView>('targets');
+  const [bochkaSort, setBochkaSort] = useState<BochkaSort>('level_desc');
+  const [bochkaSearch, setBochkaSearch] = useState('');
 
   const isPvpUnlocked = user.titleLevel >= 6;
   const isTsar = user.titleLevel >= 12;
@@ -68,14 +102,47 @@ export function RaidsScreen() {
     [raidTargets],
   );
 
-  // -- Handle returning from battle with serf capture toast --
+  // -- Bochka sorted & filtered targets --
+  const bochkaTargets = useMemo(() => {
+    let list = [...MOCK_BOCHKA_TARGETS];
+    if (bochkaSearch) {
+      const q = bochkaSearch.toLowerCase();
+      list = list.filter(t => t.username.toLowerCase().includes(q) || t.cityName.toLowerCase().includes(q));
+    }
+    switch (bochkaSort) {
+      case 'level_desc': list.sort((a, b) => b.titleLevel - a.titleLevel); break;
+      case 'level_asc': list.sort((a, b) => a.titleLevel - b.titleLevel); break;
+      case 'silver_desc': list.sort((a, b) => b.silver - a.silver); break;
+      case 'silver_asc': list.sort((a, b) => a.silver - b.silver); break;
+    }
+    return list;
+  }, [bochkaSort, bochkaSearch]);
+
+  // -- Handle returning from battle --
   const handleBattleBack = () => {
     setBattleTargetId(null);
   };
 
-  // Wrapper to enter battle that also handles post-raid serf toast
   const handleAttack = (targetId: number) => {
     setBattleTargetId(targetId);
+  };
+
+  const handlePlantBochka = (target: BochkaTarget) => {
+    if (target.isExploded || target.isMined) return;
+    // Mock: check if player has bochka (100 stars)
+    if (user.stars < 100) {
+      addToast({
+        type: 'error',
+        message: language === 'ru' ? 'Нужна Бочка пороха (100⭐)' : 'Need Powder Keg (100⭐)',
+      });
+      return;
+    }
+    addToast({
+      type: 'success',
+      message: language === 'ru'
+        ? `💣 Бочка заложена у @${target.username}! Враг должен обезвредить за 10 мин.`
+        : `💣 Barrel planted at @${target.username}! Enemy must defuse in 10 min.`,
+    });
   };
 
   if (battleTargetId !== null) {
@@ -92,25 +159,151 @@ export function RaidsScreen() {
       <Screen>
         <div className={styles.locked}>
           <img src={getAssetUrl('ui_main/ui_nabegi')} alt="" className={styles.lockedIcon} />
-          <h2>Набеги заблокированы</h2>
-          <p>Достигни титула Купец (ур. 6), чтобы разблокировать PvP набеги.</p>
+          <h2>{language === 'ru' ? 'Набеги заблокированы' : 'Raids Locked'}</h2>
+          <p>{language === 'ru'
+            ? 'Достигни титула Купец (ур. 6), чтобы разблокировать PvP набеги.'
+            : 'Reach Merchant title (lv. 6) to unlock PvP raids.'}</p>
         </div>
       </Screen>
     );
   }
 
+  // ─── Bochka Catalog View ───
+  if (view === 'bochka') {
+    return (
+      <Screen>
+        <div className={styles.header}>
+          <h2>{language === 'ru' ? '💣 Бочка пороха' : '💣 Powder Keg'}</h2>
+          <Button variant="ghost" size="sm" onClick={() => setView('targets')}>
+            {language === 'ru' ? '← Набеги' : '← Raids'}
+          </Button>
+        </div>
+
+        {/* Info banner */}
+        <div className={styles.bochkaInfo}>
+          <p>
+            {language === 'ru'
+              ? 'Выберите цель для подрыва. Бочка уничтожает весь доход города на 24 часа.'
+              : 'Select target for explosion. Barrel destroys all city income for 24 hours.'}
+          </p>
+          <span className={styles.bochkaCost}>
+            {language === 'ru' ? 'Стоимость:' : 'Cost:'} 100⭐
+          </span>
+        </div>
+
+        {/* Sort & Search */}
+        <div className={styles.bochkaControls}>
+          <input
+            type="text"
+            className={styles.bochkaSearchInput}
+            placeholder={language === 'ru' ? '🔍 Поиск по имени/городу...' : '🔍 Search name/city...'}
+            value={bochkaSearch}
+            onChange={(e) => setBochkaSearch(e.target.value)}
+          />
+          <div className={styles.sortBtns}>
+            {([
+              { key: 'level_desc' as BochkaSort, label: language === 'ru' ? 'Ур. ↓' : 'Lv. ↓' },
+              { key: 'level_asc' as BochkaSort, label: language === 'ru' ? 'Ур. ↑' : 'Lv. ↑' },
+              { key: 'silver_desc' as BochkaSort, label: '🪙 ↓' },
+              { key: 'silver_asc' as BochkaSort, label: '🪙 ↑' },
+            ]).map(s => (
+              <button
+                key={s.key}
+                className={`${styles.sortBtn} ${bochkaSort === s.key ? styles.sortActive : ''}`}
+                onClick={() => setBochkaSort(s.key)}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Target List */}
+        <div className={styles.targetList}>
+          {bochkaTargets.map((target) => {
+            const title = getTitleByLevel(target.titleLevel);
+            const canPlant = !target.isExploded && !target.isMined;
+            return (
+              <div key={target.id} className={`${styles.targetCard} ${target.isExploded ? styles.targetExploded : ''}`}>
+                <div className={styles.targetInfo}>
+                  <div className={styles.targetHeader}>
+                    <img src={getAssetUrl(title.assetKey)} alt="" className={styles.targetAvatar} />
+                    <div>
+                      <span className={styles.targetName}>@{target.username}</span>
+                      <span className={styles.targetCity}>
+                        {target.cityName} {'\u2022'} {language === 'ru' ? title.nameRu : title.nameEn}
+                        {target.clanName && ` [${target.clanName}]`}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.targetStats}>
+                    <CurrencyBadge type="silver" amount={target.silver} size="sm" />
+                  </div>
+                  <div className={styles.badges}>
+                    {target.isExploded && (
+                      <span className={`${styles.badge} ${styles.badgeRed}`}>
+                        💥 {language === 'ru' ? 'Взорван' : 'Exploded'}
+                      </span>
+                    )}
+                    {target.isMined && !target.isExploded && (
+                      <span className={`${styles.badge} ${styles.badgeOrange}`}>
+                        ⏳ {language === 'ru' ? 'Заминирован' : 'Mined'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <button
+                  className={styles.plantBtn}
+                  onClick={() => handlePlantBochka(target)}
+                  disabled={!canPlant}
+                >
+                  {canPlant
+                    ? (language === 'ru' ? '💣 Заложить' : '💣 Plant')
+                    : (language === 'ru' ? '—' : '—')}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Defuse info */}
+        <div className={styles.bochkaDefuseInfo}>
+          <h4>{language === 'ru' ? '🔧 Обезвреживание' : '🔧 Defusing'}</h4>
+          <div className={styles.defuseRow}>
+            <span>🪨 {language === 'ru' ? 'Огниво' : 'Flint'}</span>
+            <span className={styles.defuseChance}>33%</span>
+            <span className={styles.defuseCost}>5,000🪙</span>
+          </div>
+          <div className={styles.defuseRow}>
+            <span>🔮 {language === 'ru' ? 'Мастер' : 'Master'}</span>
+            <span className={styles.defuseChance}>75%</span>
+            <span className={styles.defuseCost}>50⭐</span>
+          </div>
+        </div>
+      </Screen>
+    );
+  }
+
+  // ─── Main Raid Targets View ───
   return (
     <Screen>
       <div className={styles.header}>
-        <h2>Набеги</h2>
-        <Button variant="ghost" size="sm" onClick={refreshTargets}>Обновить</Button>
+        <h2>{language === 'ru' ? 'Набеги' : 'Raids'}</h2>
+        <div className={styles.headerActions}>
+          <Button variant="ghost" size="sm" onClick={() => setView('bochka')}>
+            💣
+          </Button>
+          <Button variant="ghost" size="sm" onClick={refreshTargets}>
+            {language === 'ru' ? 'Обновить' : 'Refresh'}
+          </Button>
+        </div>
       </div>
 
       {/* Tsar flavor restriction */}
       {isTsar && (
         <div className={styles.statusBanner}>
           <span className={styles.statusIcon}>&#128081;</span>
-          <span>Царь не ведёт набеги лично</span>
+          <span>{language === 'ru' ? 'Царь не ведёт набеги лично' : 'The Tsar does not raid personally'}</span>
         </div>
       )}
 
@@ -118,7 +311,7 @@ export function RaidsScreen() {
       {!isTsar && onCooldown && (
         <div className={styles.statusBanner}>
           <span className={styles.statusIcon}>&#9203;</span>
-          <span>Кулдаун: {formatCooldown(cooldownSeconds)}</span>
+          <span>{language === 'ru' ? 'Кулдаун' : 'Cooldown'}: {formatCooldown(cooldownSeconds)}</span>
         </div>
       )}
 
@@ -126,7 +319,7 @@ export function RaidsScreen() {
       {!isTsar && lowHealth && (
         <div className={`${styles.statusBanner} ${styles.statusDanger}`}>
           <span className={styles.statusIcon}>&#10071;</span>
-          <span>Мало здоровья! Минимум {GAME.PVP_MIN_HEALTH_TO_ATTACK} HP</span>
+          <span>{language === 'ru' ? `Мало здоровья! Минимум ${GAME.PVP_MIN_HEALTH_TO_ATTACK} HP` : `Low health! Minimum ${GAME.PVP_MIN_HEALTH_TO_ATTACK} HP`}</span>
         </div>
       )}
 
@@ -148,7 +341,9 @@ export function RaidsScreen() {
                   <img src={getAssetUrl(title.assetKey)} alt="" className={styles.targetAvatar} />
                   <div>
                     <span className={styles.targetName}>@{target.username}</span>
-                    <span className={styles.targetCity}>{target.cityName} {'\u2022'} {title.nameRu}</span>
+                    <span className={styles.targetCity}>
+                      {target.cityName} {'\u2022'} {language === 'ru' ? title.nameRu : title.nameEn}
+                    </span>
                   </div>
                 </div>
                 <div className={styles.targetStats}>
@@ -159,18 +354,23 @@ export function RaidsScreen() {
                 {/* Defense indicator badges */}
                 <div className={styles.badges}>
                   {isIronDome && (
-                    <span className={`${styles.badge} ${styles.badgeRed}`}>Железный купол</span>
+                    <span className={`${styles.badge} ${styles.badgeRed}`}>
+                      {language === 'ru' ? 'Железный купол' : 'Iron Dome'}
+                    </span>
                   )}
                   {target.hasStoneWall && (
-                    <span className={`${styles.badge} ${styles.badgeBlue}`}>Каменная стена</span>
+                    <span className={`${styles.badge} ${styles.badgeBlue}`}>
+                      {language === 'ru' ? 'Каменная стена' : 'Stone Wall'}
+                    </span>
                   )}
                   {target.hasMoat && (
-                    <span className={`${styles.badge} ${styles.badgeCyan}`}>Ров (+50% защиты)</span>
+                    <span className={`${styles.badge} ${styles.badgeCyan}`}>
+                      {language === 'ru' ? 'Ров (+50% защиты)' : 'Moat (+50% defense)'}
+                    </span>
                   )}
-                  {/* Diminishing returns warning */}
                   {recentCount > 0 && (
                     <span className={`${styles.badge} ${styles.badgeOrange}`}>
-                      Лут: x{diminishingFactor.toFixed(2)}
+                      {language === 'ru' ? 'Лут' : 'Loot'}: x{diminishingFactor.toFixed(2)}
                     </span>
                   )}
                 </div>
@@ -181,7 +381,9 @@ export function RaidsScreen() {
                 onClick={() => handleAttack(target.id)}
                 disabled={!canAttack}
               >
-                {isIronDome ? 'Защищён' : 'Напасть'}
+                {isIronDome
+                  ? (language === 'ru' ? 'Защищён' : 'Shielded')
+                  : (language === 'ru' ? 'Напасть' : 'Attack')}
               </Button>
             </div>
           );

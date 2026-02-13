@@ -25,6 +25,7 @@ export function BattleScreen({ targetId, onBack }: BattleScreenProps) {
   const raidTargets = useGameStore((s) => s.raidTargets);
   const executeRaid = useGameStore((s) => s.executeRaid);
   const addToast = useGameStore((s) => s.addToast);
+  const language = useGameStore((s) => s.user.language);
   const haptics = useHaptics();
 
   const [phase, setPhase] = useState<BattlePhase>('pre');
@@ -54,10 +55,10 @@ export function BattleScreen({ targetId, onBack }: BattleScreenProps) {
       serfToastFired.current = true;
       const serf = result.serfCaptured;
       const profession = getProfessionById(serf.professionId);
-      const profName = profession?.nameRu ?? serf.professionId;
+      const profName = language === 'ru' ? (profession?.nameRu ?? serf.professionId) : (profession?.nameEn ?? serf.professionId);
       addToast({
         type: 'reward',
-        message: `Захвачен холоп: ${serf.name} (${profName})!`,
+        message: language === 'ru' ? `Захвачен холоп: ${serf.name} (${profName})!` : `Serf captured: ${serf.name} (${profName})!`,
         duration: 5000,
       });
     }
@@ -72,8 +73,8 @@ export function BattleScreen({ targetId, onBack }: BattleScreenProps) {
     return (
       <Screen>
         <div className={styles.notFound}>
-          <p>Цель не найдена</p>
-          <Button variant="secondary" onClick={onBack}>Назад</Button>
+          <p>{language === 'ru' ? 'Цель не найдена' : 'Target not found'}</p>
+          <Button variant="secondary" onClick={onBack}>{language === 'ru' ? 'Назад' : 'Back'}</Button>
         </div>
       </Screen>
     );
@@ -84,7 +85,7 @@ export function BattleScreen({ targetId, onBack }: BattleScreenProps) {
       {/* Back Button */}
       {phase === 'pre' && (
         <button className={styles.backBtn} onClick={onBack} type="button">
-          &#8592; Назад
+          &#8592; {language === 'ru' ? 'Назад' : 'Back'}
         </button>
       )}
 
@@ -95,11 +96,11 @@ export function BattleScreen({ targetId, onBack }: BattleScreenProps) {
           <div className={styles.fighter}>
             <img
               src={getAssetUrl(playerTitle.assetKey)}
-              alt={playerTitle.nameRu}
+              alt={language === 'ru' ? playerTitle.nameRu : playerTitle.nameEn}
               className={styles.fighterAvatar}
             />
             <span className={styles.fighterName}>@{user.username}</span>
-            <span className={styles.fighterTitle}>{playerTitle.nameRu}</span>
+            <span className={styles.fighterTitle}>{language === 'ru' ? playerTitle.nameRu : playerTitle.nameEn}</span>
             <div className={styles.fighterStats}>
               <span>ATK {playerAtk}</span>
               <span>DEF {playerDef}</span>
@@ -116,12 +117,12 @@ export function BattleScreen({ targetId, onBack }: BattleScreenProps) {
           <div className={styles.fighter}>
             <img
               src={getAssetUrl(targetTitle.assetKey)}
-              alt={targetTitle.nameRu}
+              alt={language === 'ru' ? targetTitle.nameRu : targetTitle.nameEn}
               className={styles.fighterAvatar}
             />
             <span className={styles.fighterName}>@{target.username}</span>
             <span className={styles.fighterTitle}>
-              {targetTitle.nameRu} {'\u2022'} {target.cityName}
+              {language === 'ru' ? targetTitle.nameRu : targetTitle.nameEn} {'\u2022'} {target.cityName}
             </span>
             <div className={styles.fighterStats}>
               <span>DEF {target.defense}</span>
@@ -155,7 +156,7 @@ export function BattleScreen({ targetId, onBack }: BattleScreenProps) {
             fullWidth
             onClick={startBattle}
           >
-            Напасть!
+            {language === 'ru' ? 'Напасть!' : 'Attack!'}
           </Button>
         </div>
       )}

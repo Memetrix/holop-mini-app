@@ -4,7 +4,7 @@
  */
 
 // ─── Tab Navigation ───
-export type TabId = 'territory' | 'raids' | 'caves' | 'shop' | 'profile';
+export type TabId = 'territory' | 'serfs' | 'raids' | 'caves' | 'shop' | 'profile';
 
 // ─── Currency Types ───
 export type CurrencyType = 'silver' | 'gold' | 'stars' | 'ref_stars' | 'reputation';
@@ -30,6 +30,10 @@ export interface User {
   dailyStreak: number;
   serfSlots: number;
   serfSlotsUsed: number;
+  serfSlotsPurchased: number;  // Extra slots bought with stars
+  masterId: number | null;     // If captured as serf, this is master's ID
+  isFree: boolean;             // true = free player, false = someone's serf
+  captureProtectionUntil: string | null;  // 24h protection after being freed
   clanId: string | null;
   ironDomeActive: boolean;
   ironDomeUntil: string | null;
@@ -63,12 +67,23 @@ export interface Serf {
   professionId: string;
   goldPer30m: number;
   goldBonus: number;
+  level: number;           // Serf level (affects gold income)
+  spr: number;             // Serf Power Rating (affects gold income)
   lastCollected: string;
   ownerId: number;
   capturedAt: string;
   protectionType: string | null;
   protectionUntil: string | null;
   dailyIncome: number;
+}
+
+// ─── Ransom Currency Result ───
+export type RansomCurrency = 'silver' | 'gold' | 'stars';
+
+export interface RansomPriceResult {
+  amount: number;
+  currency: RansomCurrency;
+  silverEquivalent: number;  // For display: "~15,000 серебра"
 }
 
 // ─── Equipment ───
@@ -218,7 +233,7 @@ export interface RaidHistory {
 }
 
 // ─── Shop Category ───
-export type ShopCategory = 'weapons' | 'armor' | 'specials' | 'defense' | 'potions' | 'explosives' | 'boosters';
+export type ShopCategory = 'weapons' | 'armor' | 'specials' | 'defense' | 'potions' | 'explosives' | 'boosters' | 'lootboxes';
 
 // ─── Clan ───
 export interface Clan {
@@ -262,11 +277,11 @@ export type ScreenId =
   | 'shop/potions'
   | 'shop/explosives'
   | 'shop/boosters'
+  | 'serfs'
+  | 'serfs/my'
+  | 'serfs/catalog'
+  | 'serfs/buy-slot'
   | 'profile'
-  | 'profile/serfs'
-  | 'profile/serfs/detail'
-  | 'profile/serfs/protect'
-  | 'profile/serfs/ransom'
   | 'profile/clan'
   | 'profile/bank'
   | 'profile/daily';

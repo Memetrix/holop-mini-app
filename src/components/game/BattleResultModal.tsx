@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
 import { Button } from '@/components/ui/Button';
@@ -32,6 +33,7 @@ export function BattleResultModal({
   reputationGained,
   opponentName,
 }: BattleResultModalProps) {
+  const language = useGameStore((s) => s.user.language);
   const haptics = useHaptics();
 
   useEffect(() => {
@@ -64,7 +66,7 @@ export function BattleResultModal({
         <div className={`${styles.header} ${won ? styles.headerWon : styles.headerLost}`}>
           <ResultEffect won={won} width={window.innerWidth > 428 ? 428 : window.innerWidth} height={140} />
           <h2 className={styles.title}>
-            {won ? 'ПОБЕДА!' : 'ПОРАЖЕНИЕ'}
+            {won ? (language === 'ru' ? 'ПОБЕДА!' : 'VICTORY!') : (language === 'ru' ? 'ПОРАЖЕНИЕ' : 'DEFEAT')}
           </h2>
           {won && <div className={styles.shimmer} />}
         </div>
@@ -76,7 +78,7 @@ export function BattleResultModal({
         {/* Loot Section */}
         {won && hasLoot && (
           <div className={styles.lootSection}>
-            <h4 className={styles.sectionLabel}>Добыча</h4>
+            <h4 className={styles.sectionLabel}>{language === 'ru' ? 'Добыча' : 'Loot'}</h4>
             <div className={styles.lootGrid}>
               {silverLooted > 0 && (
                 <CurrencyBadge type="silver" amount={silverLooted} size="lg" showSign />
@@ -93,23 +95,23 @@ export function BattleResultModal({
 
         {/* Combat Log */}
         <div className={styles.logSection}>
-          <h4 className={styles.sectionLabel}>Боевой журнал</h4>
+          <h4 className={styles.sectionLabel}>{language === 'ru' ? 'Боевой журнал' : 'Combat Log'}</h4>
           <div className={styles.logScroll}>
             {combatLog.map((entry) => (
               <div key={entry.turn} className={styles.logEntry}>
-                <span className={styles.logTurn}>Раунд {entry.turn}</span>
+                <span className={styles.logTurn}>{language === 'ru' ? 'Раунд' : 'Round'} {entry.turn}</span>
                 <div className={styles.logDamages}>
                   <span className={styles.dmgGreen}>
-                    &minus;{entry.attackerDamage} HP врагу
+                    &minus;{entry.attackerDamage} HP {language === 'ru' ? 'врагу' : 'to enemy'}
                   </span>
                   <span className={styles.dmgSep}>{'\u2022'}</span>
                   <span className={styles.dmgRed}>
-                    &minus;{entry.defenderDamage} HP вам
+                    &minus;{entry.defenderDamage} HP {language === 'ru' ? 'вам' : 'to you'}
                   </span>
                 </div>
                 <div className={styles.logHp}>
-                  <span>Враг: {entry.defenderHp} HP</span>
-                  <span>Вы: {entry.attackerHp} HP</span>
+                  <span>{language === 'ru' ? 'Враг' : 'Enemy'}: {entry.defenderHp} HP</span>
+                  <span>{language === 'ru' ? 'Вы' : 'You'}: {entry.attackerHp} HP</span>
                 </div>
               </div>
             ))}
@@ -124,7 +126,7 @@ export function BattleResultModal({
             fullWidth
             onClick={onClose}
           >
-            {won ? 'Забрать добычу' : 'Продолжить'}
+            {won ? (language === 'ru' ? 'Забрать добычу' : 'Claim Loot') : (language === 'ru' ? 'Продолжить' : 'Continue')}
           </Button>
         </div>
       </div>

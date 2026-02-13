@@ -11,6 +11,7 @@ import { RaidsScreen } from '@/screens/raids/RaidsScreen';
 import { CavesScreen } from '@/screens/caves/CavesScreen';
 import { ShopScreen } from '@/screens/shop/ShopScreen';
 import { ProfileScreen } from '@/screens/profile/ProfileScreen';
+import { SerfScreen } from '@/screens/serfs/SerfScreen';
 
 function ScreenRouter() {
   const activeTab = useGameStore((s) => s.activeTab);
@@ -18,6 +19,8 @@ function ScreenRouter() {
   switch (activeTab) {
     case 'territory':
       return <TerritoryScreen />;
+    case 'serfs':
+      return <SerfScreen />;
     case 'raids':
       return <RaidsScreen />;
     case 'caves':

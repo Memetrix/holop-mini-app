@@ -1,0 +1,302 @@
+/* ─── Serf Screen — matches bot §3 Холопы ─── */
+
+.header {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.screenTitle {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--gold-light);
+}
+
+.slotCount {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--parchment);
+  background: rgba(42, 31, 18, 0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+}
+
+.freedomBadge {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  color: #66BB6A;
+  margin-top: var(--space-2);
+}
+
+/* ─── Quick Actions ─── */
+
+.quickActions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.actionBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px) saturate(1.6);
+  -webkit-backdrop-filter: blur(12px) saturate(1.6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-2);
+  color: var(--parchment);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.actionBtn:active:not(:disabled) {
+  background: rgba(200, 151, 62, 0.15);
+}
+
+.actionBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.actionDisabled {
+  opacity: 0.35;
+}
+
+.actionIcon {
+  font-size: 20px;
+}
+
+.actionLabel {
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ─── Bonus Summary ─── */
+
+.bonusSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  background: rgba(76, 175, 80, 0.08);
+  border: 1px solid rgba(76, 175, 80, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.bonusItem {
+  font-size: 12px;
+  font-weight: 500;
+  color: #66BB6A;
+}
+
+/* ─── Section ─── */
+
+.section {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.section h3 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--gold-light);
+  margin-bottom: var(--space-3);
+}
+
+.emptyText {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+  padding: var(--space-4) 0;
+}
+
+/* ─── Serf List ─── */
+
+.serfList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.serfCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: rgba(42, 31, 18, 0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.serfCard:active {
+  background: rgba(42, 31, 18, 0.8);
+}
+
+.serfProtected {
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.serfImg {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.serfInfo {
+  flex: 1;
+}
+
+.serfName {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--parchment);
+}
+
+.serfProf {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.serfLevel {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.serfProtectionBadge {
+  display: inline-block;
+  font-size: 10px;
+  color: #4CAF50;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-top: 2px;
+}
+
+/* ─── Serf Actions (expanded) ─── */
+
+.serfActions {
+  background: rgba(26, 16, 8, 0.6);
+  border: 1px solid var(--glass-border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  padding: var(--space-3);
+  margin-top: -2px;
+}
+
+.serfMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.serfActionGroup {
+  margin-bottom: var(--space-2);
+}
+
+.serfActionGroup:last-child {
+  margin-bottom: 0;
+}
+
+.serfActionLabel {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.protectionList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.protectionBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(42, 31, 18, 0.5);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  color: var(--parchment);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.protectionBtn:active:not(:disabled) {
+  background: rgba(200, 151, 62, 0.15);
+}
+
+.protectionBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.protName {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.protEffect {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.protCost {
+  font-weight: 600;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+/* ─── Action Active State ─── */
+.actionActive { border-color: var(--gold); background: rgba(200, 151, 62, 0.12); }
+
+/* ─── Catalog ─── */
+.catalogCard { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); background: rgba(42, 31, 18, 0.5); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: var(--space-3); }
+.catalogInfo { flex: 1; min-width: 0; }
+.catalogMeta { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.catalogOwner { display: block; font-size: 10px; color: var(--gold); margin-top: 1px; }
+.catalogActions { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.catalogBlocked { font-size: 11px; color: var(--text-muted); font-style: italic; }
+
+/* ─── Capture Result ─── */
+.captureResult { display: flex; align-items: center; gap: var(--space-2); background: rgba(76, 175, 80, 0.12); border: 1px solid rgba(76, 175, 80, 0.3); border-radius: var(--radius-md); padding: var(--space-3); margin-bottom: var(--space-3); font-size: 13px; color: var(--parchment); }
+.closeResult { background: none; border: none; color: var(--text-muted); font-size: 14px; cursor: pointer; padding: 4px; margin-left: auto; }

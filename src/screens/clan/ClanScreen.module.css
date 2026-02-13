@@ -1,0 +1,58 @@
+/* ─── Clan/Kingdom Screen — matches bot §10 Княжества ─── */
+
+.header { background: var(--glass-bg); backdrop-filter: blur(16px) saturate(1.8); -webkit-backdrop-filter: blur(16px) saturate(1.8); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: var(--space-4); margin-bottom: var(--space-3); }
+.screenTitle { font-family: var(--font-display); font-size: 22px; color: var(--gold-light); }
+.headerRole { display: block; font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+/* No Clan */
+.noClanCard { background: var(--glass-bg); backdrop-filter: blur(16px) saturate(1.8); -webkit-backdrop-filter: blur(16px) saturate(1.8); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; margin-top: var(--space-4); }
+.noClanIcon { font-size: 48px; display: block; margin-bottom: var(--space-3); }
+.noClanTitle { font-family: var(--font-display); font-size: 24px; color: var(--gold-light); margin-bottom: var(--space-2); }
+.noClanDesc { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: var(--space-4); }
+.noClanActions { display: flex; flex-direction: column; gap: var(--space-2); }
+
+/* Tabs */
+.tabBar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: var(--space-2); margin-bottom: var(--space-3); -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.tabBar::-webkit-scrollbar { display: none; }
+.tab { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; background: var(--glass-bg); backdrop-filter: blur(12px) saturate(1.6); -webkit-backdrop-filter: blur(12px) saturate(1.6); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 8px 12px; color: var(--text-muted); font-family: inherit; font-size: 16px; cursor: pointer; transition: all 150ms ease; }
+.tabActive { border-color: var(--gold); color: var(--gold-light); background: rgba(200, 151, 62, 0.1); }
+.tabLabel { font-size: 10px; font-weight: 500; }
+
+.section { background: var(--glass-bg); backdrop-filter: blur(16px) saturate(1.8); -webkit-backdrop-filter: blur(16px) saturate(1.8); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: var(--space-4); margin-bottom: var(--space-3); }
+.section h3 { font-family: var(--font-display); font-size: 16px; color: var(--gold-light); margin-bottom: var(--space-3); }
+
+/* Overview */
+.overviewGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); margin-bottom: var(--space-3); }
+.overviewStat { display: flex; flex-direction: column; align-items: center; gap: 2px; background: rgba(42, 31, 18, 0.5); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: var(--space-3); }
+.overviewValue { font-size: 18px; font-weight: 700; color: var(--gold-light); }
+.overviewLabel { font-size: 11px; color: var(--text-muted); }
+.warBanner { text-align: center; background: rgba(229, 115, 115, 0.1); border: 1px solid rgba(229, 115, 115, 0.3); border-radius: var(--radius-md); padding: var(--space-3); font-size: 14px; font-weight: 600; color: #E57373; }
+
+/* Members */
+.memberList { display: flex; flex-direction: column; gap: 2px; }
+.memberRow { display: flex; align-items: center; justify-content: space-between; padding: 10px var(--space-2); border-radius: var(--radius-sm); }
+.memberRow:nth-child(odd) { background: rgba(42, 31, 18, 0.3); }
+.memberInfo { flex: 1; }
+.memberName { display: block; font-size: 13px; font-weight: 600; color: var(--parchment); }
+.memberRole { display: block; font-size: 11px; color: var(--text-muted); }
+.memberPower { font-size: 13px; font-weight: 600; color: var(--gold); }
+
+/* Treasury */
+.treasuryBalance { display: flex; justify-content: center; padding: var(--space-4) 0; }
+.treasuryHint { font-size: 12px; color: var(--text-muted); text-align: center; }
+
+/* Territories */
+.territoryList { display: flex; flex-direction: column; gap: var(--space-2); }
+.territoryCard { display: flex; align-items: center; justify-content: space-between; padding: var(--space-3); background: rgba(42, 31, 18, 0.4); border: 1px solid var(--glass-border); border-radius: var(--radius-md); }
+.territoryClaimed { border-color: rgba(76, 175, 80, 0.3); background: rgba(76, 175, 80, 0.05); }
+.territoryInfo { flex: 1; }
+.territoryName { display: block; font-size: 14px; font-weight: 600; color: var(--parchment); }
+.territoryBonus { display: block; font-size: 11px; color: var(--gold); margin-top: 2px; }
+.claimBtn { background: rgba(200, 151, 62, 0.15); border: 1px solid var(--gold); border-radius: var(--radius-sm); padding: 6px 12px; color: var(--gold-light); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.claimBtn:active { background: rgba(200, 151, 62, 0.3); }
+
+/* War */
+.warInfo { text-align: center; padding: var(--space-3); margin-bottom: var(--space-3); }
+.warScore { font-size: 20px; font-weight: 700; color: var(--gold-light); margin-top: var(--space-2); }
+
+.emptyText { font-size: 13px; color: var(--text-muted); text-align: center; padding: var(--space-4) 0; }

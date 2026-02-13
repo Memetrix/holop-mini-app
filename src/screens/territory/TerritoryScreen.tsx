@@ -23,6 +23,7 @@ export function TerritoryScreen() {
   const buildings = useGameStore((s) => s.buildings);
   const totalIncome = useGameStore((s) => s.totalHourlyIncome);
   const collectIncome = useGameStore((s) => s.collectIncome);
+  const language = useGameStore((s) => s.user.language);
   const haptics = useHaptics();
 
   // Bottom sheets state
@@ -111,7 +112,7 @@ export function TerritoryScreen() {
               className={styles.titleIcon}
             />
             <div className={styles.incomeInfo}>
-              <span className={styles.titleName}>{title.nameRu}</span>
+              <span className={styles.titleName}>{language === 'ru' ? title.nameRu : title.nameEn}</span>
               <span className={styles.incomeValue}>{formatIncome(totalIncome)}</span>
             </div>
           </div>
@@ -121,7 +122,7 @@ export function TerritoryScreen() {
               max={nextTitle.incomeThreshold}
               variant="gold"
               showLabel
-              label="До следующего титула"
+              label={language === 'ru' ? 'До следующего титула' : 'Until next title'}
             />
           )}
         </div>
@@ -135,13 +136,13 @@ export function TerritoryScreen() {
             alt=""
             style={{ width: 20, height: 20 }}
           />
-          Собрать доход
+          {language === 'ru' ? 'Собрать доход' : 'Collect Income'}
         </Button>
       </div>
 
       {/* Building count badge */}
       <div className={styles.buildingCountBadge}>
-        {buildings.length} зданий
+        {buildings.length} {language === 'ru' ? 'зданий' : 'buildings'}
       </div>
 
       {/* ─── Bottom Sheets ─── */}

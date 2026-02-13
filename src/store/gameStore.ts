@@ -53,8 +53,14 @@ import {
 import {
   SERF_PROFESSIONS,
   SERF_PROTECTION,
-  calculateRansomPrice,
+  SERF_CONFIG,
+  SPR_CONFIG,
+  calculateRansomPriceMultiCurrency,
+  calculateSerfGoldPer30m,
+  calculateSerfDailyIncome,
+  getSlotPurchaseCost,
 } from '@/config/serfs';
+import { LOOTBOXES, rollDrop, rollSilverAmount } from '@/config/lootboxes';
 
 // ─── Mock Data ───
 
@@ -78,6 +84,10 @@ const MOCK_USER: User = {
   dailyStreak: 7,
   serfSlots: 8,
   serfSlotsUsed: 3,
+  serfSlotsPurchased: 2,
+  masterId: null,
+  isFree: true,
+  captureProtectionUntil: null,
   clanId: null,
   ironDomeActive: false,
   ironDomeUntil: null,
@@ -103,28 +113,38 @@ const MOCK_BUILDINGS: Building[] = [
   { id: 'krepost', level: 3, income: 3125, cooldownUntil: null, slotIndex: 4 },
 ];
 
+// Mock serfs with SPR-based gold income (synced with bot formula)
+// goldPer30m = floor((3 + spr/50) * (1 + profBonus) * (1 + level * 0.10))
 const MOCK_SERFS: Serf[] = [
   {
     id: 1, name: 'Ванька', nameEn: 'Vanka', professionId: 'craftsman_serf',
-    goldPer30m: 12, goldBonus: 0.25,
+    level: 5, spr: 80,
+    goldPer30m: calculateSerfGoldPer30m(80, 'craftsman_serf', 5), // (3+1.6)*1.3*1.5 = 8
+    goldBonus: 0.30,
     lastCollected: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
     ownerId: 123456789, capturedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    protectionType: null, protectionUntil: null, dailyIncome: 576,
+    protectionType: null, protectionUntil: null,
+    dailyIncome: calculateSerfDailyIncome(80, 'craftsman_serf', 5),
   },
   {
     id: 2, name: 'Марфа', nameEn: 'Marfa', professionId: 'architect',
-    goldPer30m: 18, goldBonus: 0.35,
+    level: 8, spr: 150,
+    goldPer30m: calculateSerfGoldPer30m(150, 'architect', 8), // (3+3)*1.1*1.8 = 11
+    goldBonus: 0.10,
     lastCollected: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
     ownerId: 123456789, capturedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     protectionType: 'strazha', protectionUntil: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
-    dailyIncome: 864,
+    dailyIncome: calculateSerfDailyIncome(150, 'architect', 8),
   },
   {
     id: 3, name: 'Фёдор', nameEn: 'Fyodor', professionId: 'plowman',
-    goldPer30m: 8, goldBonus: 0.0,
+    level: 3, spr: 40,
+    goldPer30m: calculateSerfGoldPer30m(40, 'plowman', 3), // (3+0.8)*1.5*1.3 = 7
+    goldBonus: 0.50,
     lastCollected: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
     ownerId: 123456789, capturedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    protectionType: null, protectionUntil: null, dailyIncome: 384,
+    protectionType: null, protectionUntil: null,
+    dailyIncome: calculateSerfDailyIncome(40, 'plowman', 3),
   },
 ];
 
@@ -257,7 +277,12 @@ interface GameState {
   // Serfs
   collectSerfGold: () => number;
   protectSerf: (serfId: number, protectionId: string) => boolean;
+  guardAllSerfs: (protectionId: string) => { guarded: number; cost: number } | false;
   ransomSerf: (serfId: number) => boolean;
+  releaseSerf: (serfId: number) => boolean;
+  buySerfSlot: () => boolean;
+  rerollProfession: (serfId: number) => boolean;
+  freeSelf: () => boolean;
 
   // Daily Bonus
   getDailyBonusState: () => DailyBonusState;
@@ -268,6 +293,9 @@ interface GameState {
   unlockBank: () => boolean;
   depositToBank: (amount: number) => boolean;
   withdrawFromBank: () => { silver: number; interest: number };
+
+  // Lootboxes
+  openLootbox: (type: 'normal' | 'premium', count: number) => { drops: { nameRu: string; nameEn: string; rarity: string; silver?: number }[] } | false;
 
   // Toasts
   addToast: (toast: Omit<Toast, 'id'>) => void;
@@ -576,19 +604,24 @@ export const useGameStore = create<GameState>((set, get) => ({
       if (user.serfSlotsUsed < user.serfSlots && Math.random() < 0.2) {
         const prof = randomSerfProfession();
         const nameIdx = Math.floor(Math.random() * SERF_NAMES_RU.length);
+        // Mock SPR based on target stats (synced with bot formula)
+        const mockSpr = Math.floor(target.titleLevel * 10 + Math.random() * 50);
+        const mockLevel = Math.max(1, Math.floor(target.titleLevel * 0.8));
         serfCaptured = {
           id: ++serfIdCounter,
           name: SERF_NAMES_RU[nameIdx],
           nameEn: SERF_NAMES_EN[nameIdx],
           professionId: prof.id,
-          goldPer30m: Math.floor(10 * (1 + prof.goldBonus)),
+          level: mockLevel,
+          spr: mockSpr,
+          goldPer30m: calculateSerfGoldPer30m(mockSpr, prof.id, mockLevel),
           goldBonus: prof.goldBonus,
           lastCollected: new Date().toISOString(),
           ownerId: user.id,
           capturedAt: new Date().toISOString(),
           protectionType: null,
           protectionUntil: null,
-          dailyIncome: Math.floor(10 * (1 + prof.goldBonus) * 48), // 48 intervals per day
+          dailyIncome: calculateSerfDailyIncome(mockSpr, prof.id, mockLevel),
         };
       }
     }
@@ -895,6 +928,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     const now = new Date();
     let totalGold = 0;
 
+    // Freedom bonus: +15% if player has no master (synced with bot)
+    const freedomMult = user.isFree ? (1 + SPR_CONFIG.freedomBonus) : 1;
+
     const updatedSerfs = serfs.map(serf => {
       const lastCollected = new Date(serf.lastCollected);
       const hoursPassed = Math.min(
@@ -903,7 +939,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       );
       if (hoursPassed >= 0.5) {
         const hourlyGold = serf.goldPer30m * 2;
-        const gold = Math.floor(hourlyGold * hoursPassed);
+        const gold = Math.floor(hourlyGold * hoursPassed * freedomMult);
         totalGold += gold;
         return { ...serf, lastCollected: now.toISOString() };
       }
@@ -919,7 +955,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         },
         serfs: updatedSerfs,
       });
-      get().addToast({ type: 'reward', message: `+${totalGold} золота от холопов!` });
+      const freedomText = user.isFree ? ' (+15% свобода)' : '';
+      get().addToast({ type: 'reward', message: `+${totalGold} золота от холопов!${freedomText}` });
     }
 
     return totalGold;
@@ -945,25 +982,155 @@ export const useGameStore = create<GameState>((set, get) => ({
     return true;
   },
 
+  guardAllSerfs: (protectionId) => {
+    const { user, serfs } = get();
+    const protection = SERF_PROTECTION.find(p => p.id === protectionId);
+    if (!protection) return false;
+
+    const now = Date.now();
+    const unguarded = serfs.filter(s => {
+      if (!s.protectionUntil) return true;
+      return new Date(s.protectionUntil).getTime() <= now;
+    });
+
+    if (unguarded.length === 0) {
+      get().addToast({ type: 'info', message: 'Все холопы уже защищены!' });
+      return false;
+    }
+
+    const totalCost = unguarded.length * protection.costGold;
+    if (user.gold < totalCost) {
+      get().addToast({ type: 'error', message: `Нужно ${totalCost} золота (есть ${user.gold})` });
+      return false;
+    }
+
+    const until = new Date(now + protection.durationHours * 60 * 60 * 1000).toISOString();
+    const unguardedIds = new Set(unguarded.map(s => s.id));
+
+    set({
+      user: { ...user, gold: user.gold - totalCost },
+      serfs: serfs.map(s =>
+        unguardedIds.has(s.id) ? { ...s, protectionType: protectionId, protectionUntil: until } : s
+      ),
+    });
+    get().addToast({
+      type: 'success',
+      message: `${protection.nameRu} установлена на ${unguarded.length} холопов! (-${totalCost} золота)`,
+    });
+    return { guarded: unguarded.length, cost: totalCost };
+  },
+
   ransomSerf: (serfId) => {
     const { user, serfs } = get();
     const serf = serfs.find(s => s.id === serfId);
     if (!serf) return false;
 
     const hoursOwned = (Date.now() - new Date(serf.capturedAt).getTime()) / (1000 * 60 * 60);
-    const price = calculateRansomPrice(serf.dailyIncome, hoursOwned);
+    const ransom = calculateRansomPriceMultiCurrency(serf.dailyIncome, hoursOwned);
 
-    if (user.silver < price) return false;
+    // Check correct currency
+    let canAfford = false;
+    switch (ransom.currency) {
+      case 'silver': canAfford = user.silver >= ransom.amount; break;
+      case 'gold': canAfford = user.gold >= ransom.amount; break;
+      case 'stars': canAfford = user.stars >= ransom.amount; break;
+    }
+    if (!canAfford) return false;
+
+    const updatedUser = { ...user, serfSlotsUsed: Math.max(0, user.serfSlotsUsed - 1) };
+    switch (ransom.currency) {
+      case 'silver': updatedUser.silver -= ransom.amount; break;
+      case 'gold': updatedUser.gold -= ransom.amount; break;
+      case 'stars': updatedUser.stars -= ransom.amount; break;
+    }
+
+    set({ user: updatedUser, serfs: serfs.filter(s => s.id !== serfId) });
+
+    const currSymbol = ransom.currency === 'silver' ? 'серебра' : ransom.currency === 'gold' ? 'золота' : 'звёзд';
+    get().addToast({ type: 'info', message: `${serf.name} выкуплен(а) за ${ransom.amount.toLocaleString('ru-RU')} ${currSymbol}` });
+    return true;
+  },
+
+  releaseSerf: (serfId) => {
+    const { user, serfs } = get();
+    const serf = serfs.find(s => s.id === serfId);
+    if (!serf) return false;
+
+    set({
+      user: { ...user, serfSlotsUsed: Math.max(0, user.serfSlotsUsed - 1) },
+      serfs: serfs.filter(s => s.id !== serfId),
+    });
+    get().addToast({ type: 'info', message: `${serf.name} отпущен(а) на свободу!` });
+    return true;
+  },
+
+  buySerfSlot: () => {
+    const { user } = get();
+    if (user.serfSlots >= SERF_CONFIG.maxSlots) {
+      get().addToast({ type: 'error', message: 'Максимум слотов!' });
+      return false;
+    }
+    const cost = getSlotPurchaseCost(user.serfSlotsPurchased);
+    if (user.stars < cost) {
+      get().addToast({ type: 'error', message: `Нужно ${cost} звёзд` });
+      return false;
+    }
 
     set({
       user: {
         ...user,
-        silver: user.silver - price,
-        serfSlotsUsed: Math.max(0, user.serfSlotsUsed - 1),
+        stars: user.stars - cost,
+        serfSlots: user.serfSlots + 1,
+        serfSlotsPurchased: user.serfSlotsPurchased + 1,
       },
-      serfs: serfs.filter(s => s.id !== serfId),
     });
-    get().addToast({ type: 'info', message: `${serf.name} выкуплен(а) за ${price.toLocaleString('ru-RU')} серебра` });
+    get().addToast({ type: 'success', message: `Новый слот холопа! (${user.serfSlots + 1}/${SERF_CONFIG.maxSlots}) -${cost}⭐` });
+    return true;
+  },
+
+  rerollProfession: (serfId) => {
+    const { user, serfs } = get();
+    const serf = serfs.find(s => s.id === serfId);
+    if (!serf) return false;
+
+    const cost = SERF_CONFIG.professionChoiceCostStars;
+    if (user.stars < cost) {
+      get().addToast({ type: 'error', message: `Нужно ${cost} звёзд` });
+      return false;
+    }
+
+    const newProf = randomSerfProfession();
+    const newGoldPer30m = calculateSerfGoldPer30m(serf.spr, newProf.id, serf.level);
+    const newDailyIncome = calculateSerfDailyIncome(serf.spr, newProf.id, serf.level);
+
+    set({
+      user: { ...user, stars: user.stars - cost },
+      serfs: serfs.map(s =>
+        s.id === serfId
+          ? { ...s, professionId: newProf.id, goldBonus: newProf.goldBonus, goldPer30m: newGoldPer30m, dailyIncome: newDailyIncome }
+          : s
+      ),
+    });
+    get().addToast({ type: 'reward', message: `${serf.name} теперь ${newProf.nameRu}! (-${cost}⭐)` });
+    return true;
+  },
+
+  freeSelf: () => {
+    const { user } = get();
+    if (user.isFree || !user.masterId) {
+      get().addToast({ type: 'info', message: 'Ты уже свободен!' });
+      return false;
+    }
+    // In bot: costs gold. Mock: just free the player.
+    set({
+      user: {
+        ...user,
+        masterId: null,
+        isFree: true,
+        captureProtectionUntil: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      },
+    });
+    get().addToast({ type: 'reward', message: 'Ты снова свободен! Защита от захвата 24ч.' });
     return true;
   },
 
@@ -1123,6 +1290,49 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
     get().addToast({ type: 'reward', message: `Из казны: ${total.toLocaleString('ru-RU')} серебра (+${interest} процентов)` });
     return { silver: bank.depositedSilver, interest };
+  },
+
+  // ═══════════════════════════════════════════
+  // Lootboxes
+  // ═══════════════════════════════════════════
+  openLootbox: (type, count) => {
+    const { user } = get();
+    const lootbox = type === 'normal'
+      ? { currency: 'gold' as const, price: 100 }
+      : { currency: 'stars' as const, price: 10 };
+
+    const totalCost = lootbox.price * count;
+
+    if (lootbox.currency === 'gold' && user.gold < totalCost) return false;
+    if (lootbox.currency === 'stars' && user.stars < totalCost) return false;
+
+    // Deduct currency
+    const updatedUser = { ...user };
+    if (lootbox.currency === 'gold') updatedUser.gold -= totalCost;
+    else updatedUser.stars -= totalCost;
+
+    // Roll drops (mock — in real API the server resolves drops)
+    const lbDef = LOOTBOXES.find((l) => l.id === type);
+    if (!lbDef) return false;
+
+    const drops: { nameRu: string; nameEn: string; rarity: string; silver?: number }[] = [];
+    for (let i = 0; i < count; i++) {
+      const drop = rollDrop(lbDef);
+      const entry: { nameRu: string; nameEn: string; rarity: string; silver?: number } = {
+        nameRu: drop.nameRu,
+        nameEn: drop.nameEn,
+        rarity: drop.rarity,
+      };
+      if (drop.category === 'silver') {
+        const amt = rollSilverAmount(drop);
+        entry.silver = amt;
+        updatedUser.silver = Math.min(updatedUser.silver + amt, GAME.MAX_SILVER);
+      }
+      drops.push(entry);
+    }
+
+    set({ user: updatedUser });
+    return { drops };
   },
 
   // ═══════════════════════════════════════════

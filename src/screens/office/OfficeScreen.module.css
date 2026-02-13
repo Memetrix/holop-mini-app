@@ -1,0 +1,246 @@
+/* ─── Office / Палата Screen ─── */
+
+.header {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.screenTitle {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--gold-light);
+  margin-bottom: var(--space-3);
+}
+
+.repStatus {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.repRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.repLabel {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.repValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--parchment);
+}
+
+.repCap {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.repBonus {
+  color: var(--gold);
+  font-size: 12px;
+}
+
+/* ─── Collection Card ─── */
+
+.collectCard {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.collectInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.collectLabel {
+  font-size: 14px;
+  color: var(--parchment);
+}
+
+.collectValue {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+.collectTimer {
+  text-align: center;
+  margin-bottom: var(--space-3);
+}
+
+.timerText {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.timerFull {
+  font-size: 12px;
+  color: #66BB6A;
+  font-weight: 600;
+}
+
+/* ─── Sections ─── */
+
+.section {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.section h3 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--gold-light);
+  margin-bottom: var(--space-3);
+}
+
+.emptyText {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+  padding: var(--space-3) 0;
+}
+
+/* ─── Item Lists ─── */
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ownedItem,
+.shopItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: rgba(42, 31, 18, 0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.ownedItem {
+  border-color: rgba(76, 175, 80, 0.2);
+}
+
+.itemEmoji {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.itemInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemName {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--parchment);
+}
+
+.itemRate {
+  display: block;
+  font-size: 12px;
+  color: var(--gold);
+  margin-top: 1px;
+}
+
+.buyBtn {
+  background: rgba(200, 151, 62, 0.15);
+  border: 1px solid var(--gold-dark);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  color: var(--gold-light);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.buyBtn:active {
+  background: rgba(200, 151, 62, 0.3);
+}
+
+/* ─── Unlock Card ─── */
+
+.unlockCard {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+}
+
+.unlockIcon {
+  font-size: 56px;
+  display: block;
+  margin-bottom: var(--space-3);
+}
+
+.unlockTitle {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--gold-light);
+  margin-bottom: var(--space-2);
+}
+
+.unlockDesc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: var(--space-4);
+}
+
+.unlockCost {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+}
+
+/* ─── Info Card ─── */
+
+.infoCard {
+  background: rgba(42, 31, 18, 0.4);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.infoText {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  text-align: center;
+}

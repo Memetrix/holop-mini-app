@@ -1,0 +1,260 @@
+/* ─── Bank/Treasury Screen — matches bot §8 Казна ─── */
+
+.header {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.screenTitle {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--gold-light);
+}
+
+.subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+}
+
+/* ─── Locked State ─── */
+
+.lockedCard {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  text-align: center;
+  margin-top: var(--space-4);
+}
+
+.lockedIcon {
+  font-size: 48px;
+  margin-bottom: var(--space-3);
+}
+
+.lockedTitle {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--gold-light);
+  margin-bottom: var(--space-2);
+}
+
+.lockedDesc {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: var(--space-4);
+}
+
+.lockedCost {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+}
+
+.insufficientText {
+  font-size: 12px;
+  color: #E57373;
+  margin-top: var(--space-2);
+}
+
+/* ─── Balance Card ─── */
+
+.balanceCard {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.balanceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+}
+
+.balanceLabel {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.totalLabel {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--parchment);
+}
+
+.interestValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: #66BB6A;
+}
+
+.balanceDivider {
+  height: 1px;
+  background: var(--glass-border);
+  margin: var(--space-2) 0;
+}
+
+.depositMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--glass-border);
+}
+
+/* ─── Actions ─── */
+
+.actionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+/* ─── Deposit Panel ─── */
+
+.depositPanel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.depositPanel h3 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--gold-light);
+  margin-bottom: var(--space-2);
+}
+
+.depositHint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.presetRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.presetBtn {
+  background: rgba(42, 31, 18, 0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  color: var(--parchment);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.presetBtn:active:not(:disabled) {
+  background: rgba(200, 151, 62, 0.15);
+}
+
+.presetBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.inputRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.depositInput {
+  flex: 1;
+  background: rgba(26, 16, 8, 0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  color: var(--parchment);
+  font-family: inherit;
+  font-size: 16px;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.depositInput::placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.depositInput::-webkit-inner-spin-button,
+.depositInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.depositInput:focus {
+  border-color: var(--gold);
+}
+
+.balanceHint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ─── Info Card ─── */
+
+.infoCard {
+  background: rgba(33, 150, 243, 0.06);
+  border: 1px solid rgba(33, 150, 243, 0.15);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.infoCard h3 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: #64B5F6;
+  margin-bottom: var(--space-2);
+}
+
+.infoList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.infoList li {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 4px 0;
+  padding-left: 16px;
+  position: relative;
+}
+
+.infoList li::before {
+  content: '•';
+  position: absolute;
+  left: 4px;
+  color: #64B5F6;
+}

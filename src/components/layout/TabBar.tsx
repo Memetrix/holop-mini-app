@@ -6,10 +6,11 @@ import styles from './TabBar.module.css';
 
 const TABS: { id: TabId; labelRu: string; labelEn: string; icon: string }[] = [
   { id: 'territory', labelRu: 'Территория', labelEn: 'Territory', icon: 'ui_main/ui_territory' },
+  { id: 'serfs', labelRu: 'Холопы', labelEn: 'Serfs', icon: 'ui_main/ui_holopy' },
   { id: 'raids', labelRu: 'Набеги', labelEn: 'Raids', icon: 'ui_main/ui_nabegi' },
   { id: 'caves', labelRu: 'Пещеры', labelEn: 'Caves', icon: 'ui_main/ui_caves' },
   { id: 'shop', labelRu: 'Лавка', labelEn: 'Shop', icon: 'ui_main/ui_shop' },
-  { id: 'profile', labelRu: 'Профиль', labelEn: 'Profile', icon: 'ui_misc/ui_profile' },
+  { id: 'profile', labelRu: 'Ещё', labelEn: 'More', icon: 'ui_misc/ui_profile' },
 ];
 
 export function TabBar() {

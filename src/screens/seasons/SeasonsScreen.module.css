@@ -1,0 +1,58 @@
+/* ─── Seasons Screen — matches bot §1.7 Сезонные очки ─── */
+
+.header { background: var(--glass-bg); backdrop-filter: blur(16px) saturate(1.8); -webkit-backdrop-filter: blur(16px) saturate(1.8); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: var(--space-4); margin-bottom: var(--space-3); }
+.screenTitle { font-family: var(--font-display); font-size: 20px; color: var(--gold-light); margin-bottom: var(--space-2); }
+.daysLeft { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: var(--space-2); }
+
+.tabBar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: var(--space-2); margin-bottom: var(--space-3); -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.tabBar::-webkit-scrollbar { display: none; }
+.tab { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; background: var(--glass-bg); backdrop-filter: blur(12px) saturate(1.6); -webkit-backdrop-filter: blur(12px) saturate(1.6); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 8px 12px; color: var(--text-muted); font-family: inherit; font-size: 16px; cursor: pointer; transition: all 150ms ease; }
+.tabActive { border-color: var(--gold); color: var(--gold-light); background: rgba(200, 151, 62, 0.1); }
+.tabLabel { font-size: 10px; font-weight: 500; }
+
+.section { background: var(--glass-bg); backdrop-filter: blur(16px) saturate(1.8); -webkit-backdrop-filter: blur(16px) saturate(1.8); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: var(--space-4); margin-bottom: var(--space-3); }
+.section h3 { font-family: var(--font-display); font-size: 16px; color: var(--gold-light); margin-bottom: var(--space-3); }
+
+/* Overview */
+.pointsCard { text-align: center; padding: var(--space-4) 0; }
+.pointsValue { display: block; font-family: var(--font-display); font-size: 36px; color: var(--gold-light); }
+.pointsLabel { display: block; font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+.tierInfo { display: flex; justify-content: center; gap: var(--space-4); margin-top: var(--space-2); }
+.tierBadge { font-size: 14px; font-weight: 600; color: var(--gold); background: rgba(200, 151, 62, 0.1); border: 1px solid rgba(200, 151, 62, 0.2); border-radius: var(--radius-sm); padding: 4px 12px; }
+.rankBadge { font-size: 14px; font-weight: 600; color: var(--parchment); background: rgba(42, 31, 18, 0.6); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: 4px 12px; }
+
+.sourcesSection { margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--glass-border); }
+.sourcesTitle { font-size: 13px; font-weight: 600; color: var(--gold-light); margin-bottom: var(--space-2); }
+.sourceItem { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 2px; }
+
+/* Leaderboard */
+.leaderList { display: flex; flex-direction: column; gap: 2px; }
+.leaderRow { display: flex; align-items: center; gap: var(--space-2); padding: 10px var(--space-2); border-radius: var(--radius-sm); }
+.leaderRow:nth-child(odd) { background: rgba(42, 31, 18, 0.3); }
+.leaderRank { width: 28px; text-align: center; font-size: 14px; font-weight: 700; color: var(--gold-light); flex-shrink: 0; }
+.leaderInfo { flex: 1; }
+.leaderName { display: block; font-size: 13px; font-weight: 600; color: var(--parchment); }
+.leaderTier { display: block; font-size: 10px; color: var(--text-muted); }
+.leaderPoints { font-size: 13px; font-weight: 600; color: var(--gold); }
+.userRank { text-align: center; font-size: 13px; color: var(--gold-light); font-weight: 600; padding: var(--space-3) 0; margin-top: var(--space-2); border-top: 1px solid var(--glass-border); }
+
+/* Rewards */
+.tierList { display: flex; flex-direction: column; gap: var(--space-2); }
+.tierRow { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: rgba(42, 31, 18, 0.4); border: 1px solid var(--glass-border); border-radius: var(--radius-md); opacity: 0.6; }
+.tierAchieved { opacity: 1; border-color: rgba(76, 175, 80, 0.3); background: rgba(76, 175, 80, 0.05); }
+.tierEmoji { font-size: 24px; flex-shrink: 0; }
+.tierDetails { flex: 1; }
+.tierName { display: block; font-size: 14px; font-weight: 600; color: var(--parchment); }
+.tierThreshold { display: block; font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.tierReward { display: block; font-size: 11px; color: var(--gold); margin-top: 2px; }
+.tierCheck { font-size: 16px; flex-shrink: 0; }
+
+/* History */
+.historyList { display: flex; flex-direction: column; gap: var(--space-2); }
+.historyRow { padding: var(--space-3); background: rgba(42, 31, 18, 0.4); border: 1px solid var(--glass-border); border-radius: var(--radius-md); }
+.historyInfo { flex: 1; }
+.historyName { display: block; font-size: 14px; font-weight: 600; color: var(--parchment); }
+.historyMeta { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+.emptyText { font-size: 13px; color: var(--text-muted); text-align: center; padding: var(--space-4) 0; }

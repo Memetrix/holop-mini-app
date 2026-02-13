@@ -112,3 +112,22 @@
   text-shadow: 0 0 12px rgba(200, 151, 62, 0.6);
   white-space: nowrap;
 }
+
+/* ─── Lootbox Styles ─── */
+
+.lootboxCard { background: var(--glass-bg); backdrop-filter: blur(16px) saturate(1.8); -webkit-backdrop-filter: blur(16px) saturate(1.8); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: var(--space-4); margin-bottom: var(--space-3); }
+.lootboxHeader { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); }
+.lootboxEmoji { font-size: 40px; flex-shrink: 0; }
+.lootboxTitle { flex: 1; }
+.lootboxDesc { display: block; font-size: 12px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+.lootboxActions { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-3); }
+.dropTableToggle { display: block; width: 100%; background: none; border: none; color: var(--text-muted); font-size: 12px; font-family: inherit; cursor: pointer; padding: 6px 0; text-align: center; transition: color 150ms ease; }
+.dropTableToggle:active { color: var(--gold); }
+.dropTable { display: flex; flex-direction: column; gap: 2px; padding-top: var(--space-2); border-top: 1px solid var(--glass-border); }
+.dropRow { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
+.dropRarity { font-size: 12px; font-weight: 500; }
+.dropChance { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+.lootboxResults { background: var(--glass-bg); backdrop-filter: blur(16px) saturate(1.8); -webkit-backdrop-filter: blur(16px) saturate(1.8); border: 1px solid var(--gold); border-radius: var(--radius-lg); padding: var(--space-4); margin-top: var(--space-3); animation: purchaseFlash 600ms ease; }
+.resultsTitle { font-family: var(--font-display); font-size: 16px; color: var(--gold-light); margin-bottom: var(--space-3); }
+.resultItem { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--glass-border); font-size: 13px; }
+.resultItem:last-of-type { border-bottom: none; margin-bottom: var(--space-3); }

@@ -1,0 +1,32 @@
+/* ─── Achievements Screen — matches bot §15 Достижения ─── */
+
+.header { background: var(--glass-bg); backdrop-filter: blur(16px) saturate(1.8); -webkit-backdrop-filter: blur(16px) saturate(1.8); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: var(--space-4); margin-bottom: var(--space-3); }
+.screenTitle { font-family: var(--font-display); font-size: 22px; color: var(--gold-light); }
+
+.categoryGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); margin-bottom: var(--space-3); }
+.categoryCard { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--glass-bg); backdrop-filter: blur(12px) saturate(1.6); -webkit-backdrop-filter: blur(12px) saturate(1.6); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: var(--space-4); color: var(--parchment); font-family: inherit; cursor: pointer; transition: background 150ms ease; }
+.categoryCard:active { background: rgba(200, 151, 62, 0.15); }
+.catEmoji { font-size: 28px; }
+.catName { font-size: 14px; font-weight: 600; }
+.catProgress { font-size: 12px; color: var(--text-muted); }
+.catBadge { position: absolute; top: 8px; right: 8px; background: #E57373; color: white; font-size: 11px; font-weight: 700; min-width: 20px; height: 20px; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 0 6px; }
+
+.backBtn { background: none; border: none; color: var(--gold); font-family: inherit; font-size: 14px; cursor: pointer; padding: var(--space-2) 0; margin-bottom: var(--space-2); }
+.backBtn:active { opacity: 0.7; }
+
+.achList { background: var(--glass-bg); backdrop-filter: blur(16px) saturate(1.8); -webkit-backdrop-filter: blur(16px) saturate(1.8); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: var(--space-4); }
+.achTitle { font-family: var(--font-display); font-size: 18px; color: var(--gold-light); margin-bottom: var(--space-3); }
+
+.achCard { display: flex; gap: var(--space-3); padding: var(--space-3); background: rgba(42, 31, 18, 0.4); border: 1px solid var(--glass-border); border-radius: var(--radius-md); margin-bottom: var(--space-2); }
+.achClaimed { opacity: 0.6; }
+.achInfo { flex: 1; }
+.achName { display: block; font-size: 14px; font-weight: 600; color: var(--parchment); margin-bottom: 2px; }
+.achDesc { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+.achProgressBar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+.achProgressFill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 300ms ease; }
+.achProgressText { font-size: 10px; color: var(--text-muted); }
+
+.achReward { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 6px; flex-shrink: 0; }
+.achRewardText { font-size: 11px; color: var(--gold); white-space: nowrap; }
+.claimBtn { background: rgba(76, 175, 80, 0.2); border: 1px solid rgba(76, 175, 80, 0.4); border-radius: var(--radius-sm); padding: 6px 12px; color: #66BB6A; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.claimBtn:active { background: rgba(76, 175, 80, 0.35); }

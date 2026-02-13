@@ -108,7 +108,7 @@ export function BuildingInfoSheet({ building, onClose }: BuildingInfoSheetProps)
           <div className={styles.imageGlow} style={{ backgroundColor: `${levelColor}20` }} />
           <img
             src={getAssetUrl(def.assetKey)}
-            alt={def.nameRu}
+            alt={language === 'ru' ? def.nameRu : def.nameEn}
             className={styles.bigImage}
           />
         </div>
@@ -137,14 +137,14 @@ export function BuildingInfoSheet({ building, onClose }: BuildingInfoSheetProps)
             <span className={styles.statLabel}>
               {language === 'ru' ? 'Текущий доход' : 'Current Income'}
             </span>
-            <span className={styles.statValue}>+{formatNumber(building.income)}/ч</span>
+            <span className={styles.statValue}>+{formatNumber(building.income)}/{language === 'ru' ? 'ч' : 'hr'}</span>
           </div>
           {!isMaxLevel && (
             <div className={styles.statCard}>
               <span className={styles.statLabel}>
                 {language === 'ru' ? 'После апгрейда' : 'After Upgrade'}
               </span>
-              <span className={styles.statValue}>+{formatNumber(nextIncome)}/ч</span>
+              <span className={styles.statValue}>+{formatNumber(nextIncome)}/{language === 'ru' ? 'ч' : 'hr'}</span>
             </div>
           )}
           {isMaxLevel && (

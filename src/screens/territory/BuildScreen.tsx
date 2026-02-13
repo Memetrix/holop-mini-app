@@ -23,6 +23,7 @@ export function BuildScreen({ onClose, targetSlotIndex }: BuildScreenProps) {
   const user = useGameStore((s) => s.user);
   const buildings = useGameStore((s) => s.buildings);
   const buildNewBuilding = useGameStore((s) => s.buildNewBuilding);
+  const language = useGameStore((s) => s.user.language);
   const haptics = useHaptics();
   const { sheetRef, handlers } = useSwipeSheet({ onClose });
 
@@ -47,7 +48,7 @@ export function BuildScreen({ onClose, targetSlotIndex }: BuildScreenProps) {
       >
         <div className={styles.handle} />
         <div className={styles.header}>
-          <h3>Построить здание</h3>
+          <h3>{language === 'ru' ? 'Построить здание' : 'Build Structure'}</h3>
           <button className={styles.closeBtn} onClick={onClose}>
             ✕
           </button>
@@ -55,7 +56,7 @@ export function BuildScreen({ onClose, targetSlotIndex }: BuildScreenProps) {
 
         {availableBuildings.length === 0 ? (
           <div className={styles.empty}>
-            <p>Все доступные здания построены!</p>
+            <p>{language === 'ru' ? 'Все доступные здания построены!' : 'All available buildings constructed!'}</p>
           </div>
         ) : (
           <div className={styles.list}>
@@ -71,16 +72,16 @@ export function BuildScreen({ onClose, targetSlotIndex }: BuildScreenProps) {
                     className={styles.img}
                   />
                   <div className={styles.info}>
-                    <span className={styles.name}>{def.nameRu}</span>
+                    <span className={styles.name}>{language === 'ru' ? def.nameRu : def.nameEn}</span>
                     <span className={styles.desc}>
-                      +{formatNumber(def.baseIncome)}/ч • макс. ур. {def.maxLevel}
+                      +{formatNumber(def.baseIncome)}/{language === 'ru' ? 'ч' : 'h'} • {language === 'ru' ? 'макс. ур.' : 'max lv.'} {def.maxLevel}
                     </span>
                     <span className={styles.tier}>{def.tier}</span>
                     {!prereqs.met && (
                       <span className={styles.prereq}>
-                        Нужно: {prereqs.missing.map((m) => {
+                        {language === 'ru' ? 'Нужно' : 'Requires'}: {prereqs.missing.map((m) => {
                           const req = getBuildingById(m.buildingId);
-                          return `${req?.nameRu ?? m.buildingId} ур.${m.requiredLevel}`;
+                          return `${language === 'ru' ? (req?.nameRu ?? m.buildingId) : (req?.nameEn ?? m.buildingId)} ${language === 'ru' ? 'ур.' : 'lv.'}${m.requiredLevel}`;
                         }).join(', ')}
                       </span>
                     )}
