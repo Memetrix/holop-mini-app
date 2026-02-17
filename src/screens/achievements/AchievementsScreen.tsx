@@ -9,6 +9,7 @@ import { Screen } from '@/components/layout/Screen';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
 import { formatNumber } from '@/hooks/useFormatNumber';
+import { Icon } from '@/components/ui/Icon';
 import styles from './AchievementsScreen.module.css';
 
 interface Achievement {
@@ -28,13 +29,13 @@ interface AchCategory {
   id: string;
   nameRu: string;
   nameEn: string;
-  emoji: string;
+  icon: string;
   achievements: Achievement[];
 }
 
 const MOCK_CATEGORIES: AchCategory[] = [
   {
-    id: 'warrior', nameRu: 'Воитель', nameEn: 'Warrior', emoji: '⚔️',
+    id: 'warrior', nameRu: 'Воитель', nameEn: 'Warrior', icon: 'raids',
     achievements: [
       { id: 'w1', nameRu: 'Первая кровь', nameEn: 'First Blood', descRu: 'Выиграй 1 бой', descEn: 'Win 1 battle', target: 1, current: 1, rewardSilver: 100, rewardGold: 0, claimed: true },
       { id: 'w2', nameRu: 'Воин', nameEn: 'Fighter', descRu: 'Выиграй 10 боёв', descEn: 'Win 10 battles', target: 10, current: 7, rewardSilver: 500, rewardGold: 5, claimed: false },
@@ -42,7 +43,7 @@ const MOCK_CATEGORIES: AchCategory[] = [
     ],
   },
   {
-    id: 'trader', nameRu: 'Торговец', nameEn: 'Trader', emoji: '🪙',
+    id: 'trader', nameRu: 'Торговец', nameEn: 'Trader', icon: 'silver',
     achievements: [
       { id: 't1', nameRu: 'Первый доход', nameEn: 'First Income', descRu: 'Собери 1,000 серебра', descEn: 'Collect 1,000 silver', target: 1000, current: 1000, rewardSilver: 200, rewardGold: 0, claimed: true },
       { id: 't2', nameRu: 'Купец', nameEn: 'Merchant', descRu: 'Собери 100,000 серебра', descEn: 'Collect 100,000 silver', target: 100000, current: 85000, rewardSilver: 2000, rewardGold: 20, claimed: false },
@@ -50,27 +51,27 @@ const MOCK_CATEGORIES: AchCategory[] = [
     ],
   },
   {
-    id: 'goldowner', nameRu: 'Златовладец', nameEn: 'Gold Owner', emoji: '💰',
+    id: 'goldowner', nameRu: 'Златовладец', nameEn: 'Gold Owner', icon: 'gold',
     achievements: [
       { id: 'g1', nameRu: 'Золотая монета', nameEn: 'Gold Coin', descRu: 'Накопи 10 золота', descEn: 'Save 10 gold', target: 10, current: 10, rewardSilver: 500, rewardGold: 0, claimed: true },
       { id: 'g2', nameRu: 'Сундук', nameEn: 'Chest', descRu: 'Накопи 100 золота', descEn: 'Save 100 gold', target: 100, current: 45, rewardSilver: 2500, rewardGold: 10, claimed: false },
     ],
   },
   {
-    id: 'famous', nameRu: 'Прославленный', nameEn: 'Famous', emoji: '⭐',
+    id: 'famous', nameRu: 'Прославленный', nameEn: 'Famous', icon: 'reputation',
     achievements: [
       { id: 'f1', nameRu: 'Известный', nameEn: 'Known', descRu: 'Набери 100 репутации', descEn: 'Gain 100 reputation', target: 100, current: 50, rewardSilver: 500, rewardGold: 5, claimed: false },
     ],
   },
   {
-    id: 'serfmaster', nameRu: 'Владыка', nameEn: 'Serfmaster', emoji: '⛓️',
+    id: 'serfmaster', nameRu: 'Владыка', nameEn: 'Serfmaster', icon: 'serfs',
     achievements: [
       { id: 's1', nameRu: 'Первый холоп', nameEn: 'First Serf', descRu: 'Захвати 1 холопа', descEn: 'Capture 1 serf', target: 1, current: 1, rewardSilver: 300, rewardGold: 0, claimed: true },
       { id: 's2', nameRu: 'Землевладелец', nameEn: 'Landlord', descRu: 'Захвати 5 холопов', descEn: 'Capture 5 serfs', target: 5, current: 3, rewardSilver: 1500, rewardGold: 15, claimed: false },
     ],
   },
   {
-    id: 'veteran', nameRu: 'Старожил', nameEn: 'Veteran', emoji: '📅',
+    id: 'veteran', nameRu: 'Старожил', nameEn: 'Veteran', icon: 'daily',
     achievements: [
       { id: 'v1', nameRu: 'Новичок', nameEn: 'Newcomer', descRu: 'Играй 1 день', descEn: 'Play for 1 day', target: 1, current: 1, rewardSilver: 100, rewardGold: 0, claimed: true },
       { id: 'v2', nameRu: 'Старожил', nameEn: 'Veteran', descRu: 'Играй 7 дней', descEn: 'Play for 7 days', target: 7, current: 3, rewardSilver: 700, rewardGold: 7, claimed: false },
@@ -90,8 +91,8 @@ export function AchievementsScreen({ header }: { header?: ReactNode } = {}) {
     addToast({
       type: 'reward',
       message: language === 'ru'
-        ? `Награда: ${formatNumber(ach.rewardSilver)} 🪙${ach.rewardGold > 0 ? ` + ${ach.rewardGold} 🏅` : ''}`
-        : `Reward: ${formatNumber(ach.rewardSilver)} 🪙${ach.rewardGold > 0 ? ` + ${ach.rewardGold} 🏅` : ''}`,
+        ? `Награда: ${formatNumber(ach.rewardSilver)} серебра${ach.rewardGold > 0 ? ` + ${ach.rewardGold} золота` : ''}`
+        : `Reward: ${formatNumber(ach.rewardSilver)} silver${ach.rewardGold > 0 ? ` + ${ach.rewardGold} gold` : ''}`,
     });
   };
 
@@ -101,7 +102,7 @@ export function AchievementsScreen({ header }: { header?: ReactNode } = {}) {
     <Screen header={header}>
       <div className={styles.header}>
         <h2 className={styles.screenTitle}>
-          {language === 'ru' ? '🎖️ Достижения' : '🎖️ Achievements'}
+          <Icon name="achievements" size={20} /> {language === 'ru' ? 'Достижения' : 'Achievements'}
         </h2>
       </div>
 
@@ -118,7 +119,7 @@ export function AchievementsScreen({ header }: { header?: ReactNode } = {}) {
                 className={styles.categoryCard}
                 onClick={() => setActiveCategory(cat.id)}
               >
-                <span className={styles.catEmoji}>{cat.emoji}</span>
+                <span className={styles.catEmoji}><Icon name={cat.icon} size={24} /></span>
                 <span className={styles.catName}>{language === 'ru' ? cat.nameRu : cat.nameEn}</span>
                 <span className={styles.catProgress}>{claimed}/{total}</span>
                 {claimable > 0 && <span className={styles.catBadge}>{claimable}</span>}
@@ -134,7 +135,7 @@ export function AchievementsScreen({ header }: { header?: ReactNode } = {}) {
 
           <div className={styles.achList}>
             <h3 className={styles.achTitle}>
-              {activeCat.emoji} {language === 'ru' ? activeCat.nameRu : activeCat.nameEn}
+              <Icon name={activeCat.icon} size={18} /> {language === 'ru' ? activeCat.nameRu : activeCat.nameEn}
             </h3>
 
             {activeCat.achievements.map((ach) => {
@@ -146,7 +147,7 @@ export function AchievementsScreen({ header }: { header?: ReactNode } = {}) {
                   <div className={styles.achInfo}>
                     <span className={styles.achName}>
                       {language === 'ru' ? ach.nameRu : ach.nameEn}
-                      {ach.claimed && ' ✅'}
+                      {ach.claimed && ' (done)'}
                     </span>
                     <span className={styles.achDesc}>{language === 'ru' ? ach.descRu : ach.descEn}</span>
                     <div className={styles.achProgressBar}>
@@ -158,8 +159,8 @@ export function AchievementsScreen({ header }: { header?: ReactNode } = {}) {
                   </div>
                   <div className={styles.achReward}>
                     <span className={styles.achRewardText}>
-                      {formatNumber(ach.rewardSilver)} 🪙
-                      {ach.rewardGold > 0 && ` ${ach.rewardGold} 🏅`}
+                      {formatNumber(ach.rewardSilver)} <Icon name="silver" size={14} />
+                      {ach.rewardGold > 0 && <>{' '}{ach.rewardGold} <Icon name="gold" size={14} /></>}
                     </span>
                     {canClaim && (
                       <button className={styles.claimBtn} onClick={() => handleClaim(ach)}>

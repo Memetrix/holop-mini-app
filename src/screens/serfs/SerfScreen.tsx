@@ -20,6 +20,7 @@ import {
 import { formatNumber } from '@/hooks/useFormatNumber';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
 import { Button } from '@/components/ui/Button';
+import { Icon } from '@/components/ui/Icon';
 import { useHaptics } from '@/hooks/useHaptics';
 import styles from './SerfScreen.module.css';
 
@@ -71,12 +72,12 @@ const MOCK_CATALOG: CatalogTarget[] = [
   { userId: 1010, username: 'vityaz_svyatoslav', cityName: 'Чернигов', spr: 320, status: 'guarded', dailyIncome: 780 },
 ];
 
-const STATUS_ICONS: Record<string, string> = {
-  free: '✅',
-  owned: '👤',
-  guarded: '🛡️',
-  clan: '👑',
-  master: '👑',
+const STATUS_LABELS_SHORT: Record<string, string> = {
+  free: '(F)',
+  owned: '(O)',
+  guarded: '(G)',
+  clan: '(C)',
+  master: '(M)',
 };
 
 const STATUS_LABELS_RU: Record<string, string> = {
@@ -243,8 +244,8 @@ export function SerfScreen() {
     addToast({
       type: 'reward',
       message: language === 'ru'
-        ? `⛓️ ${target.username} захвачен! Профессия: ${profDef?.nameRu ?? prof}`
-        : `⛓️ ${target.username} captured! Profession: ${profDef?.nameEn ?? prof}`,
+        ? `${target.username} захвачен! Профессия: ${profDef?.nameRu ?? prof}`
+        : `${target.username} captured! Profession: ${profDef?.nameEn ?? prof}`,
     });
   };
 
@@ -254,7 +255,7 @@ export function SerfScreen() {
       haptics.error();
       addToast({
         type: 'error',
-        message: language === 'ru' ? 'Нужно 5⭐ для зелья жаб' : 'Need 5⭐ for frog potion',
+        message: language === 'ru' ? 'Нужно 5 звёзд для зелья жаб' : 'Need 5 stars for frog potion',
       });
       return;
     }
@@ -262,8 +263,8 @@ export function SerfScreen() {
     addToast({
       type: 'info',
       message: language === 'ru'
-        ? `🐸 Зелье жаб использовано! Охрана у ${target.username} снята на 10 секунд`
-        : `🐸 Frog potion used! Guard on ${target.username} removed for 10 seconds`,
+        ? `Зелье жаб использовано! Охрана у ${target.username} снята на 10 секунд`
+        : `Frog potion used! Guard on ${target.username} removed for 10 seconds`,
     });
   };
 
@@ -272,14 +273,14 @@ export function SerfScreen() {
       {/* Header with gold collection */}
       <div className={styles.header}>
         <div className={styles.headerTop}>
-          <h2 className={styles.screenTitle}>{language === 'ru' ? '⛓️ Холопы' : '⛓️ Serfs'}</h2>
+          <h2 className={styles.screenTitle}><Icon name="serfs" size={20} /> {language === 'ru' ? 'Холопы' : 'Serfs'}</h2>
           <span className={styles.slotCount}>{serfs.length}/{user.serfSlots}</span>
         </div>
         <Button variant="primary" size="md" fullWidth onClick={handleCollectGold}>
-          {language === 'ru' ? '💰 Собрать золото' : '💰 Collect Gold'}
+          <><Icon name="gold" size={16} /> {language === 'ru' ? 'Собрать золото' : 'Collect Gold'}</>
         </Button>
         {user.isFree && (
-          <span className={styles.freedomBadge}>{language === 'ru' ? '🕊️ Свободен (+15% к золоту)' : '🕊️ Free (+15% gold)'}</span>
+          <span className={styles.freedomBadge}>{language === 'ru' ? 'Свободен (+15% к золоту)' : 'Free (+15% gold)'}</span>
         )}
       </div>
 
@@ -291,7 +292,7 @@ export function SerfScreen() {
           onClick={() => setShowGuardAll(!showGuardAll)}
           disabled={serfs.length === 0}
         >
-          <span className={styles.actionIcon}>🛡️</span>
+          <span className={styles.actionIcon}><Icon name="shield" size={16} /></span>
           <span className={styles.actionLabel}>{language === 'ru' ? 'Защитить всех' : 'Guard All'}</span>
         </button>
 
@@ -301,8 +302,8 @@ export function SerfScreen() {
           onClick={handleBuySlot}
           disabled={!canBuySlot}
         >
-          <span className={styles.actionIcon}>➕</span>
-          <span className={styles.actionLabel}>{language === 'ru' ? 'Слот' : 'Slot'} ({slotCost}⭐)</span>
+          <span className={styles.actionIcon}>+</span>
+          <span className={styles.actionLabel}>{language === 'ru' ? 'Слот' : 'Slot'} ({slotCost}<Icon name="stars" size={12} />)</span>
         </button>
 
         {/* Catalog */}
@@ -310,14 +311,14 @@ export function SerfScreen() {
           className={`${styles.actionBtn} ${activeView === 'catalog' ? styles.actionActive : ''}`}
           onClick={() => setActiveView(activeView === 'catalog' ? 'my' : 'catalog')}
         >
-          <span className={styles.actionIcon}>🔍</span>
+          <span className={styles.actionIcon}><Icon name="serfs" size={16} /></span>
           <span className={styles.actionLabel}>{language === 'ru' ? 'Каталог' : 'Catalog'}</span>
         </button>
 
         {/* Free Self (visible only if captured) */}
         {!user.isFree && (
           <button className={styles.actionBtn} onClick={handleFreeSelf}>
-            <span className={styles.actionIcon}>🔓</span>
+            <span className={styles.actionIcon}></span>
             <span className={styles.actionLabel}>{language === 'ru' ? 'Выкупиться' : 'Free Self'}</span>
           </button>
         )}
@@ -354,16 +355,16 @@ export function SerfScreen() {
       {serfs.length > 0 && (serfBonuses.attackBonus > 0 || serfBonuses.incomeBonus > 0) && (
         <div className={styles.bonusSummary}>
           {serfBonuses.attackBonus > 0 && (
-            <span className={styles.bonusItem}>⚔️ +{serfBonuses.attackBonus} ATK</span>
+            <span className={styles.bonusItem}><Icon name="raids" size={14} /> +{serfBonuses.attackBonus} ATK</span>
           )}
           {serfBonuses.incomeBonus > 0 && (
-            <span className={styles.bonusItem}>💰 +{Math.round(serfBonuses.incomeBonus * 100)}% {language === 'ru' ? 'доход' : 'income'}</span>
+            <span className={styles.bonusItem}><Icon name="gold" size={14} /> +{Math.round(serfBonuses.incomeBonus * 100)}% {language === 'ru' ? 'доход' : 'income'}</span>
           )}
           {serfBonuses.buildSpeedBonus > 0 && (
-            <span className={styles.bonusItem}>🏗️ -{Math.round(serfBonuses.buildSpeedBonus * 100)}% {language === 'ru' ? 'стройка' : 'build'}</span>
+            <span className={styles.bonusItem}><Icon name="build" size={14} /> -{Math.round(serfBonuses.buildSpeedBonus * 100)}% {language === 'ru' ? 'стройка' : 'build'}</span>
           )}
           {serfBonuses.hasDailyScout && (
-            <span className={styles.bonusItem}>🗡️ {language === 'ru' ? 'Разведка' : 'Scout'}</span>
+            <span className={styles.bonusItem}><Icon name="raids" size={14} /> {language === 'ru' ? 'Разведка' : 'Scout'}</span>
           )}
         </div>
       )}
@@ -371,12 +372,12 @@ export function SerfScreen() {
       {/* ─── Catalog View ─── */}
       {activeView === 'catalog' && (
         <div className={styles.section}>
-          <h3>{language === 'ru' ? '🔍 Каталог жертв' : '🔍 Target Catalog'}</h3>
+          <h3>{language === 'ru' ? 'Каталог жертв' : 'Target Catalog'}</h3>
 
           {/* Capture result banner */}
           {captureResult && (
             <div className={styles.captureResult}>
-              <span>{captureResult.success ? '⛓️' : '❌'}</span>
+              <span>{captureResult.success ? <Icon name="serfs" size={16} /> : 'X'}</span>
               <span>
                 {captureResult.success
                   ? (language === 'ru'
@@ -398,7 +399,7 @@ export function SerfScreen() {
                 <div key={target.userId} className={styles.catalogCard}>
                   <div className={styles.catalogInfo}>
                     <span className={styles.serfName}>
-                      {STATUS_ICONS[target.status]} @{target.username}
+                      {STATUS_LABELS_SHORT[target.status]} @{target.username}
                     </span>
                     <span className={styles.catalogMeta}>
                       {target.cityName} • SPR: {target.spr} • {statusLabel}
@@ -418,8 +419,8 @@ export function SerfScreen() {
                         disabled={serfs.length >= user.serfSlots}
                       >
                         {target.status === 'owned' && target.ransomCost
-                          ? `⚔️ ${formatNumber(target.ransomCost)} ${target.ransomCurrency === 'gold' ? '🏅' : target.ransomCurrency === 'stars' ? '⭐' : '🪙'}`
-                          : (language === 'ru' ? '⚔️ Захватить' : '⚔️ Capture')}
+                          ? <><Icon name="raids" size={14} /> {formatNumber(target.ransomCost)} {target.ransomCurrency === 'gold' ? <Icon name="gold" size={14} /> : target.ransomCurrency === 'stars' ? <Icon name="stars" size={14} /> : <Icon name="silver" size={14} />}</>
+                          : <>{language === 'ru' ? <><Icon name="raids" size={14} /> Захватить</> : <><Icon name="raids" size={14} /> Capture</>}</>}
                       </Button>
                     )}
                     {isGuarded && (
@@ -429,7 +430,8 @@ export function SerfScreen() {
                         onClick={() => handleFrog(target)}
                         disabled={user.stars < 5}
                       >
-                        🐸 {language === 'ru' ? 'Жаба (5⭐)' : 'Frog (5⭐)'}
+                        <><Icon name="frog" size={16} /> {language === 'ru' ? 'Жаба (5' : 'Frog (5'}<Icon name="stars" size={14} />{')'}</>
+
                       </Button>
                     )}
                     {!canCapture && !isGuarded && (
@@ -491,7 +493,7 @@ export function SerfScreen() {
                     </span>
                     {hasProtection && protDef && (
                       <span className={styles.serfProtectionBadge}>
-                        🛡️ {language === 'ru' ? protDef.nameRu : protDef.nameEn} ({formatProtectionRemaining(serf.protectionUntil!, language)})
+                        <Icon name="shield" size={14} /> {language === 'ru' ? protDef.nameRu : protDef.nameEn} ({formatProtectionRemaining(serf.protectionUntil!, language)})
                       </span>
                     )}
                   </div>
@@ -537,7 +539,7 @@ export function SerfScreen() {
                         onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleReroll(serf.id); }}
                         disabled={user.stars < SERF_CONFIG.professionChoiceCostStars}
                       >
-                        {language === 'ru' ? `🎲 Сменить профессию (${SERF_CONFIG.professionChoiceCostStars}⭐)` : `🎲 Reroll (${SERF_CONFIG.professionChoiceCostStars}⭐)`}
+                        {language === 'ru' ? `Сменить профессию (${SERF_CONFIG.professionChoiceCostStars}` : `Reroll (${SERF_CONFIG.professionChoiceCostStars}`}<Icon name="stars" size={14} />{')'}
                       </Button>
                     </div>
 
@@ -554,7 +556,7 @@ export function SerfScreen() {
                           (ransom.currency === 'stars' && user.stars < ransom.amount)
                         }
                       >
-                        {language === 'ru' ? '💰 Выкупить' : '💰 Ransom'} ({formatNumber(ransom.amount)} {currLabel})
+                        <><Icon name="gold" size={14} /> {language === 'ru' ? 'Выкупить' : 'Ransom'} ({formatNumber(ransom.amount)} {currLabel})</>
                       </Button>
                     </div>
 
@@ -567,8 +569,8 @@ export function SerfScreen() {
                         onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleRelease(serf.id); }}
                       >
                         {confirmRelease === serf.id
-                          ? (language === 'ru' ? '⚠️ Точно отпустить?' : '⚠️ Confirm release?')
-                          : (language === 'ru' ? '🔓 Отпустить' : '🔓 Release')}
+                          ? (language === 'ru' ? 'Точно отпустить?' : 'Confirm release?')
+                          : (language === 'ru' ? 'Отпустить' : 'Release')}
                       </Button>
                     </div>
                   </div>

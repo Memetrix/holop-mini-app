@@ -1,11 +1,10 @@
 /**
- * HOLOP Central Hub ("Ещё" / "More") — Main navigation hub
- * Mirrors bot's main ReplyKeyboard: all sections not in the TabBar
- * Bot has 15 buttons → 5 are in TabBar, remaining 10 are here
- * See PROJECT_MAP.md for full navigation tree
+ * HOLOP "Двор" / "Court" — Central Hub
+ * Core game mechanics: Bank (prominent), Kingdoms, Office, Daily, Rankings, Achievements, Seasons.
+ * Profile/Settings/Help/Referrals moved to AvatarDrawer (TopBar).
  */
 
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Screen } from '@/components/layout/Screen';
 import { useGameStore } from '@/store/gameStore';
 import { getAssetUrl } from '@/config/assets';
@@ -13,49 +12,69 @@ import { getTitleByLevel, getNextTitle } from '@/config/titles';
 import { formatIncome } from '@/hooks/useFormatNumber';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { BackHeader } from '@/components/ui/BackHeader';
+import { useHaptics } from '@/hooks/useHaptics';
+import { CourtScene } from '@/pixi/CourtScene';
 import { DailyBonus } from './DailyBonus';
 import { BankScreen } from '@/screens/bank/BankScreen';
 import { LeaderboardScreen } from '@/screens/leaderboard/LeaderboardScreen';
 import { AchievementsScreen } from '@/screens/achievements/AchievementsScreen';
-import { SettingsScreen } from '@/screens/settings/SettingsScreen';
-import { ReferralsScreen } from '@/screens/referrals/ReferralsScreen';
 import { ClanScreen } from '@/screens/clan/ClanScreen';
 import { SeasonsScreen } from '@/screens/seasons/SeasonsScreen';
-import { HelpScreen } from '@/screens/help/HelpScreen';
 import { OfficeScreen } from '@/screens/office/OfficeScreen';
 import styles from './ProfileScreen.module.css';
 
-type SubScreen = null | 'bank' | 'clan' | 'leaderboard' | 'achievements' | 'referrals' | 'seasons' | 'daily' | 'settings' | 'help' | 'office' | 'profile';
+type SubScreen = null | 'bank' | 'clan' | 'leaderboard' | 'achievements' | 'seasons' | 'daily' | 'office';
 
-// Hub navigation items — matches bot's main keyboard rows 2-5
-const HUB_ITEMS: { id: SubScreen; emoji: string; labelRu: string; labelEn: string }[] = [
-  { id: 'bank', emoji: '🏦', labelRu: 'Казна', labelEn: 'Treasury' },
-  { id: 'clan', emoji: '👑', labelRu: 'Княжества', labelEn: 'Kingdoms' },
-  { id: 'office', emoji: '🏛️', labelRu: 'Палата', labelEn: 'Office' },
-  { id: 'daily', emoji: '🎁', labelRu: 'Бонус', labelEn: 'Bonus' },
-  { id: 'leaderboard', emoji: '🏆', labelRu: 'Рейтинги', labelEn: 'Rankings' },
-  { id: 'achievements', emoji: '🎖️', labelRu: 'Достижения', labelEn: 'Achievements' },
-  { id: 'seasons', emoji: '📊', labelRu: 'Сезоны', labelEn: 'Seasons' },
-  { id: 'referrals', emoji: '👥', labelRu: 'Рефералы', labelEn: 'Referrals' },
-  { id: 'settings', emoji: '⚙️', labelRu: 'Настройки', labelEn: 'Settings' },
-  { id: 'help', emoji: 'ℹ️', labelRu: 'Помощь', labelEn: 'Help' },
-  { id: 'profile', emoji: '👤', labelRu: 'Профиль', labelEn: 'Profile' },
-];
 
-export function ProfileScreen() {
+interface ProfileScreenProps {
+  /** When opened as overlay from AvatarDrawer, start on a specific sub-screen */
+  initialSubScreen?: string;
+  /** Callback when overlay back is pressed (instead of internal goBack) */
+  onOverlayBack?: () => void;
+}
+
+export function ProfileScreen({ initialSubScreen, onOverlayBack }: ProfileScreenProps = {}) {
   const user = useGameStore((s) => s.user);
   const equipment = useGameStore((s) => s.equipment);
   const clan = useGameStore((s) => s.clan);
   const totalIncome = useGameStore((s) => s.totalHourlyIncome);
   const language = useGameStore((s) => s.user.language);
+  const getDailyBonusState = useGameStore((s) => s.getDailyBonusState);
+  const haptics = useHaptics();
 
-  const [subScreen, setSubScreen] = useState<SubScreen>(null);
+  const [subScreen, setSubScreen] = useState<SubScreen>(
+    (initialSubScreen as SubScreen) ?? null,
+  );
+
+  // Viewport measurement for CourtScene
+  const [viewSize, setViewSize] = useState({ w: window.innerWidth, h: window.innerHeight });
+  const courtContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function measure() {
+      if (courtContainerRef.current) {
+        const rect = courtContainerRef.current.getBoundingClientRect();
+        setViewSize({ w: rect.width, h: rect.height });
+      }
+    }
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
+
+  // Daily bonus state
+  const canClaimDaily = getDailyBonusState().canClaim;
+
+  const handleCourtTap = useCallback((id: string) => {
+    haptics.light();
+    setSubScreen(id as SubScreen);
+  }, [haptics]);
 
   const title = getTitleByLevel(user.titleLevel);
   const nextTitle = getNextTitle(user.titleLevel);
-  const goBack = () => setSubScreen(null);
+  const goBack = onOverlayBack ? onOverlayBack : () => setSubScreen(null);
 
-  // ─── Sub-screen routing — header passed into each screen's <Screen> ───
+  // ─── Sub-screen routing ───
   if (subScreen === 'bank') return (
     <BankScreen header={<BackHeader onBack={goBack} titleRu="Казна" titleEn="Treasury" language={language} />} />
   );
@@ -65,20 +84,11 @@ export function ProfileScreen() {
   if (subScreen === 'achievements') return (
     <AchievementsScreen header={<BackHeader onBack={goBack} titleRu="Достижения" titleEn="Achievements" language={language} />} />
   );
-  if (subScreen === 'settings') return (
-    <SettingsScreen header={<BackHeader onBack={goBack} titleRu="Настройки" titleEn="Settings" language={language} />} />
-  );
-  if (subScreen === 'referrals') return (
-    <ReferralsScreen header={<BackHeader onBack={goBack} titleRu="Рефералы" titleEn="Referrals" language={language} />} />
-  );
   if (subScreen === 'clan') return (
     <ClanScreen header={<BackHeader onBack={goBack} titleRu="Княжества" titleEn="Kingdoms" language={language} />} />
   );
   if (subScreen === 'seasons') return (
     <SeasonsScreen header={<BackHeader onBack={goBack} titleRu="Сезоны" titleEn="Seasons" language={language} />} />
-  );
-  if (subScreen === 'help') return (
-    <HelpScreen header={<BackHeader onBack={goBack} titleRu="Помощь" titleEn="Help" language={language} />} />
   );
   if (subScreen === 'office') return (
     <OfficeScreen header={<BackHeader onBack={goBack} titleRu="Палата" titleEn="Office" language={language} />} />
@@ -89,14 +99,14 @@ export function ProfileScreen() {
     </Screen>
   );
 
-  // ─── Profile sub-screen ───
-  if (subScreen === 'profile') return (
+  // ─── Profile sub-screen (when opened from overlay) ───
+  if (initialSubScreen === 'profile') return (
     <Screen>
       <BackHeader onBack={goBack} titleRu="Профиль" titleEn="Profile" language={language} />
 
       {/* Player Card */}
       <div className={styles.profileCard}>
-        <img src={getAssetUrl(title.assetKey)} alt={title.nameRu} className={styles.avatar} />
+        <img src={getAssetUrl(title.assetKey)} alt={language === 'ru' ? title.nameRu : title.nameEn} className={styles.avatar} />
         <h2 className={styles.name}>@{user.username}</h2>
         <span className={styles.title}>{language === 'ru' ? title.nameRu : title.nameEn} {'\u2022'} {user.cityName}</span>
 
@@ -175,35 +185,16 @@ export function ProfileScreen() {
     </Screen>
   );
 
-  // ─── Main Hub View ───
+  // ─── Main Hub View ("Двор" / "Court") — Interactive PixiJS Courtyard ───
   return (
-    <Screen>
-      {/* Compact Player Banner */}
-      <div className={styles.hubBanner}>
-        <img src={getAssetUrl(title.assetKey)} alt="" className={styles.hubAvatar} />
-        <div className={styles.hubPlayerInfo}>
-          <span className={styles.hubName}>@{user.username}</span>
-          <span className={styles.hubTitle}>{language === 'ru' ? title.nameRu : title.nameEn}</span>
-        </div>
-        <div className={styles.hubIncome}>
-          <span className={styles.hubIncomeValue}>{formatIncome(totalIncome)}</span>
-          <span className={styles.hubIncomeLabel}>{language === 'ru' ? '/час' : '/hr'}</span>
-        </div>
-      </div>
-
-      {/* Navigation Grid — all bot sections not in TabBar */}
-      <div className={styles.navGrid}>
-        {HUB_ITEMS.map((item) => (
-          <button
-            key={item.id}
-            className={styles.navBtn}
-            onClick={() => setSubScreen(item.id)}
-          >
-            <span className={styles.navIcon}>{item.emoji}</span>
-            <span className={styles.navLabel}>{language === 'ru' ? item.labelRu : item.labelEn}</span>
-          </button>
-        ))}
-      </div>
-    </Screen>
+    <div className={styles.courtContainer} ref={courtContainerRef}>
+      <CourtScene
+        width={viewSize.w}
+        height={viewSize.h}
+        onItemTap={handleCourtTap}
+        canClaimDaily={canClaimDaily}
+        language={language}
+      />
+    </div>
   );
 }

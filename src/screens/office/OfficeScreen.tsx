@@ -14,13 +14,14 @@ import { useHaptics } from '@/hooks/useHaptics';
 import { Button } from '@/components/ui/Button';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { Icon } from '@/components/ui/Icon';
 import styles from './OfficeScreen.module.css';
 
 // ─── Office Items (matches bot office_handlers.py) ───
 
 interface OfficeItem {
   id: string;
-  emoji: string;
+  icon: string;
   nameRu: string;
   nameEn: string;
   repPerDay: number;
@@ -29,14 +30,14 @@ interface OfficeItem {
 }
 
 const OFFICE_ITEMS: OfficeItem[] = [
-  { id: 'bench',   emoji: '🪑', nameRu: 'Дубовая скамья',   nameEn: 'Oak Bench',       repPerDay: 1,  price: 1,  currency: 'gold' },
-  { id: 'table',   emoji: '📜', nameRu: 'Писцовый стол',    nameEn: 'Scribe Table',    repPerDay: 2,  price: 2,  currency: 'gold' },
-  { id: 'throne',  emoji: '🪑', nameRu: 'Резной трон',      nameEn: 'Carved Throne',   repPerDay: 3,  price: 3,  currency: 'stars' },
-  { id: 'carpet',  emoji: '🏮', nameRu: 'Персидский ковёр',  nameEn: 'Persian Carpet',  repPerDay: 10, price: 10, currency: 'stars' },
-  { id: 'icon',    emoji: '🖼️', nameRu: 'Древняя икона',    nameEn: 'Ancient Icon',    repPerDay: 20, price: 20, currency: 'stars' },
-  { id: 'cap',     emoji: '👑', nameRu: 'Шапка Мономаха',   nameEn: 'Monomakh Cap',    repPerDay: 30, price: 30, currency: 'stars' },
-  { id: 'orb',     emoji: '🔮', nameRu: 'Царская держава',  nameEn: 'Royal Orb',       repPerDay: 50, price: 50, currency: 'stars' },
-  { id: 'ark',     emoji: '🏅', nameRu: 'Золотой ковчег',   nameEn: 'Golden Ark',      repPerDay: 25, price: 25, currency: 'stars' },
+  { id: 'bench',   icon: 'bench',         nameRu: 'Дубовая скамья',   nameEn: 'Oak Bench',       repPerDay: 1,  price: 1,  currency: 'gold' },
+  { id: 'table',   icon: 'scribe',        nameRu: 'Писцовый стол',    nameEn: 'Scribe Table',    repPerDay: 2,  price: 2,  currency: 'gold' },
+  { id: 'throne',  icon: 'throne',        nameRu: 'Резной трон',      nameEn: 'Carved Throne',   repPerDay: 3,  price: 3,  currency: 'stars' },
+  { id: 'carpet',  icon: 'carpet',        nameRu: 'Персидский ковёр',  nameEn: 'Persian Carpet',  repPerDay: 10, price: 10, currency: 'stars' },
+  { id: 'icon',    icon: 'icon_painting', nameRu: 'Древняя икона',    nameEn: 'Ancient Icon',    repPerDay: 20, price: 20, currency: 'stars' },
+  { id: 'cap',     icon: 'crown',         nameRu: 'Шапка Мономаха',   nameEn: 'Monomakh Cap',    repPerDay: 30, price: 30, currency: 'stars' },
+  { id: 'orb',     icon: 'orb',           nameRu: 'Царская держава',  nameEn: 'Royal Orb',       repPerDay: 50, price: 50, currency: 'stars' },
+  { id: 'ark',     icon: 'ark',           nameRu: 'Золотой ковчег',   nameEn: 'Golden Ark',      repPerDay: 25, price: 25, currency: 'stars' },
 ];
 
 // ─── Reputation caps by title level ───
@@ -101,7 +102,7 @@ export function OfficeScreen({ header }: { header?: ReactNode } = {}) {
     setOffice({ ...office, unlocked: true });
     addToast({
       type: 'success',
-      message: language === 'ru' ? '🏛️ Палата открыта!' : '🏛️ Office unlocked!',
+      message: language === 'ru' ? 'Палата открыта!' : 'Office unlocked!',
     });
   };
 
@@ -115,7 +116,7 @@ export function OfficeScreen({ header }: { header?: ReactNode } = {}) {
       haptics.error();
       addToast({
         type: 'info',
-        message: language === 'ru' ? '⚠️ Репутация на максимуме для вашего уровня!' : '⚠️ Reputation capped for your level!',
+        message: language === 'ru' ? 'Репутация на максимуме для вашего уровня!' : 'Reputation capped for your level!',
       });
       return;
     }
@@ -129,7 +130,7 @@ export function OfficeScreen({ header }: { header?: ReactNode } = {}) {
     });
     addToast({
       type: 'success',
-      message: `📈 +${earned.toFixed(2)} ${language === 'ru' ? 'репутации' : 'reputation'}`,
+      message: `+${earned.toFixed(2)} ${language === 'ru' ? 'репутации' : 'reputation'}`,
     });
   };
 
@@ -151,7 +152,7 @@ export function OfficeScreen({ header }: { header?: ReactNode } = {}) {
     });
     addToast({
       type: 'success',
-      message: `${item.emoji} ${language === 'ru' ? item.nameRu : item.nameEn}!`,
+      message: `${language === 'ru' ? item.nameRu : item.nameEn}!`,
     });
   };
 
@@ -160,7 +161,7 @@ export function OfficeScreen({ header }: { header?: ReactNode } = {}) {
     return (
       <Screen header={header}>
         <div className={styles.unlockCard}>
-          <span className={styles.unlockIcon}>🏛️</span>
+          <span className={styles.unlockIcon}><Icon name="office" size={48} /></span>
           <h2 className={styles.unlockTitle}>
             {language === 'ru' ? 'Палата' : 'Office'}
           </h2>
@@ -186,11 +187,11 @@ export function OfficeScreen({ header }: { header?: ReactNode } = {}) {
       {/* Reputation Status */}
       <div className={styles.header}>
         <h2 className={styles.screenTitle}>
-          🏛️ {language === 'ru' ? 'Палата' : 'Office'}
+          <Icon name="office" size={20} /> {language === 'ru' ? 'Палата' : 'Office'}
         </h2>
         <div className={styles.repStatus}>
           <div className={styles.repRow}>
-            <span className={styles.repLabel}>📊 {language === 'ru' ? 'Репутация' : 'Reputation'}</span>
+            <span className={styles.repLabel}>{language === 'ru' ? 'Репутация' : 'Reputation'}</span>
             <span className={styles.repValue}>
               {office.reputation.toFixed(1)}
               {repCap && <span className={styles.repCap}>/{repCap}</span>}
@@ -198,7 +199,7 @@ export function OfficeScreen({ header }: { header?: ReactNode } = {}) {
             </span>
           </div>
           <div className={styles.repRow}>
-            <span className={styles.repLabel}>📈 {language === 'ru' ? 'Доход' : 'Income'}</span>
+            <span className={styles.repLabel}>{language === 'ru' ? 'Доход' : 'Income'}</span>
             <span className={styles.repValue}>+{dailyIncome}/{language === 'ru' ? 'день' : 'day'}</span>
           </div>
         </div>
@@ -217,17 +218,17 @@ export function OfficeScreen({ header }: { header?: ReactNode } = {}) {
       <div className={styles.collectCard}>
         <div className={styles.collectInfo}>
           <span className={styles.collectLabel}>
-            💰 {language === 'ru' ? 'Накоплено' : 'Accumulated'}
+            <Icon name="gold" size={14} /> {language === 'ru' ? 'Накоплено' : 'Accumulated'}
           </span>
           <span className={styles.collectValue}>+{accumulated.toFixed(2)}</span>
         </div>
         <div className={styles.collectTimer}>
           {hoursUntilFull > 0 ? (
             <span className={styles.timerText}>
-              ⏳ {language === 'ru' ? 'До полного' : 'Until full'}: {Math.floor(hoursUntilFull)}{language === 'ru' ? 'ч' : 'h'} {Math.floor((hoursUntilFull % 1) * 60)}{language === 'ru' ? 'м' : 'm'}
+              {language === 'ru' ? 'До полного' : 'Until full'}: {Math.floor(hoursUntilFull)}{language === 'ru' ? 'ч' : 'h'} {Math.floor((hoursUntilFull % 1) * 60)}{language === 'ru' ? 'м' : 'm'}
             </span>
           ) : (
-            <span className={styles.timerFull}>✅ {language === 'ru' ? 'Полностью накоплено!' : 'Fully accumulated!'}</span>
+            <span className={styles.timerFull}>{language === 'ru' ? 'Полностью накоплено!' : 'Fully accumulated!'}</span>
           )}
         </div>
         <Button
@@ -236,13 +237,13 @@ export function OfficeScreen({ header }: { header?: ReactNode } = {}) {
           onClick={handleCollect}
           disabled={accumulated < 0.01}
         >
-          📈 {language === 'ru' ? 'Собрать' : 'Collect'} (+{accumulated.toFixed(2)})
+          <><Icon name="collect" size={14} /> {language === 'ru' ? 'Собрать' : 'Collect'} (+{accumulated.toFixed(2)})</>
         </Button>
       </div>
 
       {/* Owned Items */}
       <div className={styles.section}>
-        <h3>{language === 'ru' ? '📦 Ваши предметы' : '📦 Your Items'}</h3>
+        <h3>{language === 'ru' ? 'Ваши предметы' : 'Your Items'}</h3>
         {office.ownedItems.length === 0 ? (
           <p className={styles.emptyText}>
             {language === 'ru' ? 'Нет предметов' : 'No items yet'}
@@ -251,7 +252,7 @@ export function OfficeScreen({ header }: { header?: ReactNode } = {}) {
           <div className={styles.itemList}>
             {OFFICE_ITEMS.filter(item => office.ownedItems.includes(item.id)).map(item => (
               <div key={item.id} className={styles.ownedItem}>
-                <span className={styles.itemEmoji}>{item.emoji}</span>
+                <span className={styles.itemEmoji}><Icon name={item.icon} size={24} /></span>
                 <div className={styles.itemInfo}>
                   <span className={styles.itemName}>{language === 'ru' ? item.nameRu : item.nameEn}</span>
                   <span className={styles.itemRate}>+{item.repPerDay}/{language === 'ru' ? 'д' : 'd'}</span>
@@ -264,11 +265,11 @@ export function OfficeScreen({ header }: { header?: ReactNode } = {}) {
 
       {/* Shop */}
       <div className={styles.section}>
-        <h3>{language === 'ru' ? '🛒 Магазин' : '🛒 Shop'}</h3>
+        <h3>{language === 'ru' ? 'Магазин' : 'Shop'}</h3>
         <div className={styles.itemList}>
           {OFFICE_ITEMS.filter(item => !office.ownedItems.includes(item.id)).map(item => (
             <div key={item.id} className={styles.shopItem}>
-              <span className={styles.itemEmoji}>{item.emoji}</span>
+              <span className={styles.itemEmoji}><Icon name={item.icon} size={24} /></span>
               <div className={styles.itemInfo}>
                 <span className={styles.itemName}>{language === 'ru' ? item.nameRu : item.nameEn}</span>
                 <span className={styles.itemRate}>+{item.repPerDay}/{language === 'ru' ? 'д' : 'd'}</span>
@@ -277,13 +278,13 @@ export function OfficeScreen({ header }: { header?: ReactNode } = {}) {
                 className={styles.buyBtn}
                 onClick={() => handleBuyItem(item)}
               >
-                {item.price} {item.currency === 'gold' ? '🏅' : '⭐'}
+                <>{item.price} <Icon name={item.currency === 'gold' ? 'gold' : 'stars'} size={14} /></>
               </button>
             </div>
           ))}
           {OFFICE_ITEMS.every(item => office.ownedItems.includes(item.id)) && (
             <p className={styles.emptyText}>
-              {language === 'ru' ? '✅ Все предметы куплены!' : '✅ All items purchased!'}
+              {language === 'ru' ? 'Все предметы куплены!' : 'All items purchased!'}
             </p>
           )}
         </div>

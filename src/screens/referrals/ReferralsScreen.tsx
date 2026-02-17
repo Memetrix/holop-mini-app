@@ -9,6 +9,7 @@ import { Screen } from '@/components/layout/Screen';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
 import { formatNumber } from '@/hooks/useFormatNumber';
+import { Icon } from '@/components/ui/Icon';
 import styles from './ReferralsScreen.module.css';
 
 // Mock referral data
@@ -51,7 +52,8 @@ export function ReferralsScreen({ header }: { header?: ReactNode } = {}) {
     <Screen header={header}>
       <div className={styles.header}>
         <h2 className={styles.screenTitle}>
-          {language === 'ru' ? '👥 Рефералы' : '👥 Referrals'}
+          <Icon name="referrals" size={20} />{' '}
+          {language === 'ru' ? 'Рефералы' : 'Referrals'}
         </h2>
         <p className={styles.subtitle}>
           {language === 'ru'
@@ -68,7 +70,7 @@ export function ReferralsScreen({ header }: { header?: ReactNode } = {}) {
         <div className={styles.linkRow}>
           <span className={styles.linkText}>{refLink}</span>
           <button className={styles.copyBtn} onClick={handleCopyLink}>
-            {language === 'ru' ? '📋 Копировать' : '📋 Copy'}
+            {language === 'ru' ? 'Копировать' : 'Copy'}
           </button>
         </div>
       </div>
@@ -98,9 +100,10 @@ export function ReferralsScreen({ header }: { header?: ReactNode } = {}) {
             return (
               <div key={level.friends} className={`${styles.levelRow} ${reached ? styles.levelReached : ''}`}>
                 <span className={styles.levelFriends}>
-                  {reached ? '✅' : '⬜'} {level.friends} {language === 'ru' ? 'друзей' : 'friends'}
+                  {reached ? <Icon name="victory" size={14} /> : <Icon name="defeat" size={14} />}{' '}
+                  {level.friends} {language === 'ru' ? 'друзей' : 'friends'}
                 </span>
-                <span className={styles.levelReward}>+{level.reward} ⭐</span>
+                <span className={styles.levelReward}>+{level.reward} <Icon name="stars" size={14} /></span>
               </div>
             );
           })}
@@ -119,7 +122,7 @@ export function ReferralsScreen({ header }: { header?: ReactNode } = {}) {
             {MOCK_REFERRALS.map((ref) => (
               <div key={ref.username} className={styles.friendRow}>
                 <span className={styles.friendName}>@{ref.username}</span>
-                <span className={styles.friendEarned}>+{ref.earned} ⭐</span>
+                <span className={styles.friendEarned}>+{ref.earned} <Icon name="stars" size={14} /></span>
               </div>
             ))}
           </div>

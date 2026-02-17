@@ -20,6 +20,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .avatar {
@@ -55,6 +57,72 @@
   color: var(--text-secondary);
   line-height: 1.1;
 }
+
+/* ─── Quick Actions ─── */
+
+.quickActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0 var(--space-2);
+}
+
+.quickBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 150ms;
+  flex-shrink: 0;
+}
+
+.quickBtn:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.quickPulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.3); }
+  50% { box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.15); }
+}
+
+.quickDot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff5252;
+  box-shadow: 0 0 4px rgba(255, 82, 82, 0.5);
+}
+
+.quickBadge {
+  position: absolute;
+  bottom: -2px;
+  right: -4px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--gold-light);
+  background: rgba(42, 31, 18, 0.9);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  padding: 0 3px;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+/* ─── Resources ─── */
 
 .resources {
   display: flex;

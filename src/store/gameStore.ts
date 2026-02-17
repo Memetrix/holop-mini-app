@@ -233,6 +233,7 @@ interface GameState {
   activeCaveBoosters: ActiveCaveBoosters;
   bank: BankState;
   activeTab: TabId;
+  overlayScreen: null | 'profile' | 'settings' | 'help' | 'referrals';
   raidTargets: RaidTarget[];
   raidHistory: RaidHistory[];
   clan: Clan | null;
@@ -243,6 +244,7 @@ interface GameState {
 
   // Navigation
   setActiveTab: (tab: TabId) => void;
+  setOverlayScreen: (screen: null | 'profile' | 'settings' | 'help' | 'referrals') => void;
 
   // Income
   collectIncome: () => void;
@@ -387,6 +389,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   activeCaveBoosters: { healthPotion: false, strengthPotion: false, fortitudePotion: false, holyLight: false },
   bank: { ...MOCK_BANK },
   activeTab: 'territory',
+  overlayScreen: null,
   raidTargets: generateRaidTargets(),
   raidHistory: [],
   clan: null,
@@ -397,6 +400,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   // Navigation
   // ═══════════════════════════════════════════
   setActiveTab: (tab) => set({ activeTab: tab }),
+  setOverlayScreen: (screen) => set({ overlayScreen: screen }),
 
   // ═══════════════════════════════════════════
   // Income Collection (with 24h cap + health mult)

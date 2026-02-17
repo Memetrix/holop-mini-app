@@ -6,11 +6,12 @@
 import { useState, type ReactNode } from 'react';
 import { Screen } from '@/components/layout/Screen';
 import { useGameStore } from '@/store/gameStore';
+import { Icon } from '@/components/ui/Icon';
 import styles from './HelpScreen.module.css';
 
 type HelpSection = {
   id: string;
-  emoji: string;
+  icon: string;
   titleRu: string;
   titleEn: string;
   contentRu: string[];
@@ -20,7 +21,7 @@ type HelpSection = {
 const HELP_SECTIONS: HelpSection[] = [
   {
     id: 'basics',
-    emoji: '🏰',
+    icon: 'territory',
     titleRu: 'Основы',
     titleEn: 'Basics',
     contentRu: [
@@ -38,7 +39,7 @@ const HELP_SECTIONS: HelpSection[] = [
   },
   {
     id: 'buildings',
-    emoji: '🏗️',
+    icon: 'build',
     titleRu: 'Здания',
     titleEn: 'Buildings',
     contentRu: [
@@ -58,7 +59,7 @@ const HELP_SECTIONS: HelpSection[] = [
   },
   {
     id: 'serfs',
-    emoji: '⛓️',
+    icon: 'serfs',
     titleRu: 'Холопы',
     titleEn: 'Serfs',
     contentRu: [
@@ -78,7 +79,7 @@ const HELP_SECTIONS: HelpSection[] = [
   },
   {
     id: 'pvp',
-    emoji: '⚔️',
+    icon: 'raids',
     titleRu: 'Набеги и PvP',
     titleEn: 'Raids & PvP',
     contentRu: [
@@ -98,7 +99,7 @@ const HELP_SECTIONS: HelpSection[] = [
   },
   {
     id: 'caves',
-    emoji: '🕳️',
+    icon: 'caves',
     titleRu: 'Пещеры',
     titleEn: 'Caves',
     contentRu: [
@@ -118,7 +119,7 @@ const HELP_SECTIONS: HelpSection[] = [
   },
   {
     id: 'clan',
-    emoji: '👑',
+    icon: 'clan',
     titleRu: 'Княжества',
     titleEn: 'Kingdoms',
     contentRu: [
@@ -138,22 +139,22 @@ const HELP_SECTIONS: HelpSection[] = [
   },
   {
     id: 'currencies',
-    emoji: '💰',
+    icon: 'gold',
     titleRu: 'Валюты',
     titleEn: 'Currencies',
     contentRu: [
-      '🪙 Серебро — основная валюта (доход, стройки)',
-      '🏅 Золото — от холопов, достижений, пещер',
-      '⭐ Звёзды — премиум валюта (покупка в Telegram)',
-      '⭐ Реферальные звёзды — от приглашённых друзей',
-      '⭐ Репутация — от пещеры славы и достижений',
+      'Серебро — основная валюта (доход, стройки)',
+      'Золото — от холопов, достижений, пещер',
+      'Звёзды — премиум валюта (покупка в Telegram)',
+      'Реферальные звёзды — от приглашённых друзей',
+      'Репутация — от пещеры славы и достижений',
     ],
     contentEn: [
-      '🪙 Silver — main currency (income, buildings)',
-      '🏅 Gold — from serfs, achievements, caves',
-      '⭐ Stars — premium currency (buy in Telegram)',
-      '⭐ Referral stars — from invited friends',
-      '⭐ Reputation — from glory cave and achievements',
+      'Silver — main currency (income, buildings)',
+      'Gold — from serfs, achievements, caves',
+      'Stars — premium currency (buy in Telegram)',
+      'Referral stars — from invited friends',
+      'Reputation — from glory cave and achievements',
     ],
   },
 ];
@@ -166,7 +167,8 @@ export function HelpScreen({ header }: { header?: ReactNode } = {}) {
     <Screen header={header}>
       <div className={styles.header}>
         <h2 className={styles.screenTitle}>
-          {language === 'ru' ? 'ℹ️ Помощь' : 'ℹ️ Help'}
+          <Icon name="help" size={18} />{' '}
+          {language === 'ru' ? 'Помощь' : 'Help'}
         </h2>
         <p className={styles.headerDesc}>
           {language === 'ru' ? 'Справочник по игре ХОЛОП' : 'HOLOP game guide'}
@@ -180,7 +182,7 @@ export function HelpScreen({ header }: { header?: ReactNode } = {}) {
               className={styles.sectionToggle}
               onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
             >
-              <span className={styles.sectionEmoji}>{section.emoji}</span>
+              <Icon name={section.icon} size={18} />
               <span className={styles.sectionTitle}>
                 {language === 'ru' ? section.titleRu : section.titleEn}
               </span>

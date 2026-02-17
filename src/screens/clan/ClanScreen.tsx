@@ -11,6 +11,7 @@ import { useHaptics } from '@/hooks/useHaptics';
 import { formatNumber } from '@/hooks/useFormatNumber';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
 import { Button } from '@/components/ui/Button';
+import { Icon } from '@/components/ui/Icon';
 import { GAME } from '@/config/constants';
 import styles from './ClanScreen.module.css';
 
@@ -50,7 +51,7 @@ export function ClanScreen({ header }: { header?: ReactNode } = {}) {
     return (
       <Screen header={header}>
         <div className={styles.noClanCard}>
-          <span className={styles.noClanIcon}>👑</span>
+          <span className={styles.noClanIcon}><Icon name="clan" size={48} /></span>
           <h2 className={styles.noClanTitle}>
             {language === 'ru' ? 'Княжества' : 'Kingdoms'}
           </h2>
@@ -73,7 +74,7 @@ export function ClanScreen({ header }: { header?: ReactNode } = {}) {
                 });
               }}
             >
-              {language === 'ru' ? '➕ Создать княжество' : '➕ Create Kingdom'}
+              {language === 'ru' ? 'Создать княжество' : 'Create Kingdom'}
             </Button>
             <Button
               variant="secondary"
@@ -83,7 +84,7 @@ export function ClanScreen({ header }: { header?: ReactNode } = {}) {
                 addToast({ type: 'info', message: language === 'ru' ? 'Поиск княжеств скоро' : 'Kingdom search coming soon' });
               }}
             >
-              {language === 'ru' ? '🔍 Найти княжество' : '🔍 Find Kingdom'}
+              {language === 'ru' ? 'Найти княжество' : 'Find Kingdom'}
             </Button>
           </div>
         </div>
@@ -92,19 +93,19 @@ export function ClanScreen({ header }: { header?: ReactNode } = {}) {
   }
 
   // Has clan — show tabs
-  const tabs: { id: ClanTab; emoji: string; labelRu: string; labelEn: string }[] = [
-    { id: 'overview', emoji: '📋', labelRu: 'Обзор', labelEn: 'Overview' },
-    { id: 'members', emoji: '👥', labelRu: 'Участники', labelEn: 'Members' },
-    { id: 'treasury', emoji: '🏦', labelRu: 'Казна', labelEn: 'Treasury' },
-    { id: 'territories', emoji: '🗺️', labelRu: 'Территории', labelEn: 'Territories' },
-    { id: 'war', emoji: '⚔️', labelRu: 'Война', labelEn: 'War' },
-    { id: 'shop', emoji: '🛒', labelRu: 'Магазин', labelEn: 'Shop' },
+  const tabs: { id: ClanTab; icon: string | null; labelRu: string; labelEn: string }[] = [
+    { id: 'overview', icon: null, labelRu: 'Обзор', labelEn: 'Overview' },
+    { id: 'members', icon: 'referrals', labelRu: 'Участники', labelEn: 'Members' },
+    { id: 'treasury', icon: 'bank', labelRu: 'Казна', labelEn: 'Treasury' },
+    { id: 'territories', icon: null, labelRu: 'Территории', labelEn: 'Territories' },
+    { id: 'war', icon: 'raids', labelRu: 'Война', labelEn: 'War' },
+    { id: 'shop', icon: 'shop', labelRu: 'Магазин', labelEn: 'Shop' },
   ];
 
   return (
     <Screen header={header}>
       <div className={styles.header}>
-        <h2 className={styles.screenTitle}>👑 {clan.name}</h2>
+        <h2 className={styles.screenTitle}><Icon name="clan" size={20} /> {clan.name}</h2>
         <span className={styles.headerRole}>
           {ROLE_NAMES[clan.role]?.[language] ?? clan.role}
         </span>
@@ -118,7 +119,7 @@ export function ClanScreen({ header }: { header?: ReactNode } = {}) {
             className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
             onClick={() => setActiveTab(tab.id)}
           >
-            <span>{tab.emoji}</span>
+            {tab.icon && <Icon name={tab.icon} size={16} />}
             <span className={styles.tabLabel}>{language === 'ru' ? tab.labelRu : tab.labelEn}</span>
           </button>
         ))}
@@ -147,7 +148,7 @@ export function ClanScreen({ header }: { header?: ReactNode } = {}) {
           </div>
           {clan.warActive && (
             <div className={styles.warBanner}>
-              ⚔️ {language === 'ru' ? 'Война идёт!' : 'War in progress!'}
+              <Icon name="raids" size={16} /> {language === 'ru' ? 'Война идёт!' : 'War in progress!'}
             </div>
           )}
         </div>
@@ -161,7 +162,7 @@ export function ClanScreen({ header }: { header?: ReactNode } = {}) {
               <div key={m.username} className={styles.memberRow}>
                 <div className={styles.memberInfo}>
                   <span className={styles.memberName}>
-                    {m.online && '🟢 '}@{m.username}
+                    {m.online && <><span style={{ color: '#4CAF50' }}>●</span>{' '}</>}@{m.username}
                   </span>
                   <span className={styles.memberRole}>{ROLE_NAMES[m.role]?.[language] ?? m.role}</span>
                 </div>
@@ -194,7 +195,7 @@ export function ClanScreen({ header }: { header?: ReactNode } = {}) {
               <div key={t.id} className={`${styles.territoryCard} ${t.claimed ? styles.territoryClaimed : ''}`}>
                 <div className={styles.territoryInfo}>
                   <span className={styles.territoryName}>
-                    {t.claimed ? '✅ ' : '⬜ '}
+                    <span style={{ color: t.claimed ? '#4CAF50' : '#9e9e9e' }}>●</span>{' '}
                     {language === 'ru' ? t.nameRu : t.nameEn}
                   </span>
                   <span className={styles.territoryBonus}>{language === 'ru' ? t.bonusRu : t.bonusEn}</span>
@@ -221,7 +222,7 @@ export function ClanScreen({ header }: { header?: ReactNode } = {}) {
           <h3>{language === 'ru' ? 'Войны' : 'Wars'}</h3>
           {clan.warActive ? (
             <div className={styles.warInfo}>
-              <p>⚔️ {language === 'ru' ? 'Война с "Орда"' : 'War with "Horde"'}</p>
+              <p><Icon name="raids" size={16} /> {language === 'ru' ? 'Война с "Орда"' : 'War with "Horde"'}</p>
               <p className={styles.warScore}>{language === 'ru' ? 'Счёт' : 'Score'}: 12 — 8</p>
             </div>
           ) : (
@@ -237,7 +238,7 @@ export function ClanScreen({ header }: { header?: ReactNode } = {}) {
               addToast({ type: 'info', message: language === 'ru' ? 'Объявление войны скоро' : 'War declaration coming soon' });
             }}
           >
-            {language === 'ru' ? '⚔️ Объявить войну' : '⚔️ Declare War'}
+            {language === 'ru' ? 'Объявить войну' : 'Declare War'}
           </Button>
         </div>
       )}

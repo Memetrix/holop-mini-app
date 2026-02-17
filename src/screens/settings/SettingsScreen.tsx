@@ -8,6 +8,7 @@ import type { ReactNode } from 'react';
 import { Screen } from '@/components/layout/Screen';
 import { useGameStore } from '@/store/gameStore';
 import { Button } from '@/components/ui/Button';
+import { Icon } from '@/components/ui/Icon';
 import { useHaptics } from '@/hooks/useHaptics';
 import styles from './SettingsScreen.module.css';
 
@@ -40,26 +41,27 @@ export function SettingsScreen({ header }: { header?: ReactNode } = {}) {
     <Screen header={header}>
       <div className={styles.header}>
         <h2 className={styles.screenTitle}>
-          {language === 'ru' ? '⚙️ Настройки' : '⚙️ Settings'}
+          <Icon name="settings" size={18} />{' '}
+          {language === 'ru' ? 'Настройки' : 'Settings'}
         </h2>
       </div>
 
       {/* Language */}
       <div className={styles.section}>
-        <h3>{language === 'ru' ? '🌐 Язык' : '🌐 Language'}</h3>
+        <h3>{language === 'ru' ? 'Язык' : 'Language'}</h3>
         <div className={styles.langGrid}>
           <button
             className={`${styles.langBtn} ${language === 'ru' ? styles.langActive : ''}`}
             onClick={() => handleLanguage('ru')}
           >
-            <span className={styles.langFlag}>🇷🇺</span>
+            <span className={styles.langFlag}>RU</span>
             <span>Русский</span>
           </button>
           <button
             className={`${styles.langBtn} ${language === 'en' ? styles.langActive : ''}`}
             onClick={() => handleLanguage('en')}
           >
-            <span className={styles.langFlag}>🇬🇧</span>
+            <span className={styles.langFlag}>EN</span>
             <span>English</span>
           </button>
         </div>
@@ -86,7 +88,7 @@ export function SettingsScreen({ header }: { header?: ReactNode } = {}) {
 
       {/* Danger Zone */}
       <div className={styles.dangerSection}>
-        <h3>{language === 'ru' ? '⚠️ Опасная зона' : '⚠️ Danger Zone'}</h3>
+        <h3 style={{ color: '#ff6b6b' }}>{language === 'ru' ? 'Опасная зона' : 'Danger Zone'}</h3>
         <p className={styles.dangerText}>
           {language === 'ru'
             ? 'Удаление аккаунта необратимо. Все данные будут потеряны.'

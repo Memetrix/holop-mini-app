@@ -6,6 +6,7 @@ import { getTitleByLevel } from '@/config/titles';
 import { GAME } from '@/config/constants';
 import { Button } from '@/components/ui/Button';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
+import { Icon } from '@/components/ui/Icon';
 import { BattleScreen } from './BattleScreen';
 import styles from './RaidsScreen.module.css';
 
@@ -133,15 +134,15 @@ export function RaidsScreen() {
     if (user.stars < 100) {
       addToast({
         type: 'error',
-        message: language === 'ru' ? 'Нужна Бочка пороха (100⭐)' : 'Need Powder Keg (100⭐)',
+        message: language === 'ru' ? 'Нужна Бочка пороха (100 звёзд)' : 'Need Powder Keg (100 stars)',
       });
       return;
     }
     addToast({
       type: 'success',
       message: language === 'ru'
-        ? `💣 Бочка заложена у @${target.username}! Враг должен обезвредить за 10 мин.`
-        : `💣 Barrel planted at @${target.username}! Enemy must defuse in 10 min.`,
+        ? `Бочка заложена у @${target.username}! Враг должен обезвредить за 10 мин.`
+        : `Barrel planted at @${target.username}! Enemy must defuse in 10 min.`,
     });
   };
 
@@ -173,7 +174,7 @@ export function RaidsScreen() {
     return (
       <Screen>
         <div className={styles.header}>
-          <h2>{language === 'ru' ? '💣 Бочка пороха' : '💣 Powder Keg'}</h2>
+          <h2><Icon name="bomb" size={20} /> {language === 'ru' ? 'Бочка пороха' : 'Powder Keg'}</h2>
           <Button variant="ghost" size="sm" onClick={() => setView('targets')}>
             {language === 'ru' ? '← Набеги' : '← Raids'}
           </Button>
@@ -187,7 +188,7 @@ export function RaidsScreen() {
               : 'Select target for explosion. Barrel destroys all city income for 24 hours.'}
           </p>
           <span className={styles.bochkaCost}>
-            {language === 'ru' ? 'Стоимость:' : 'Cost:'} 100⭐
+            {language === 'ru' ? 'Стоимость:' : 'Cost:'} 100<Icon name="stars" size={14} />
           </span>
         </div>
 
@@ -196,7 +197,7 @@ export function RaidsScreen() {
           <input
             type="text"
             className={styles.bochkaSearchInput}
-            placeholder={language === 'ru' ? '🔍 Поиск по имени/городу...' : '🔍 Search name/city...'}
+            placeholder={language === 'ru' ? 'Поиск по имени/городу...' : 'Search name/city...'}
             value={bochkaSearch}
             onChange={(e) => setBochkaSearch(e.target.value)}
           />
@@ -204,8 +205,8 @@ export function RaidsScreen() {
             {([
               { key: 'level_desc' as BochkaSort, label: language === 'ru' ? 'Ур. ↓' : 'Lv. ↓' },
               { key: 'level_asc' as BochkaSort, label: language === 'ru' ? 'Ур. ↑' : 'Lv. ↑' },
-              { key: 'silver_desc' as BochkaSort, label: '🪙 ↓' },
-              { key: 'silver_asc' as BochkaSort, label: '🪙 ↑' },
+              { key: 'silver_desc' as BochkaSort, label: '$ ↓' },
+              { key: 'silver_asc' as BochkaSort, label: '$ ↑' },
             ]).map(s => (
               <button
                 key={s.key}
@@ -242,12 +243,12 @@ export function RaidsScreen() {
                   <div className={styles.badges}>
                     {target.isExploded && (
                       <span className={`${styles.badge} ${styles.badgeRed}`}>
-                        💥 {language === 'ru' ? 'Взорван' : 'Exploded'}
+                        {language === 'ru' ? 'Взорван' : 'Exploded'}
                       </span>
                     )}
                     {target.isMined && !target.isExploded && (
                       <span className={`${styles.badge} ${styles.badgeOrange}`}>
-                        ⏳ {language === 'ru' ? 'Заминирован' : 'Mined'}
+                        {language === 'ru' ? 'Заминирован' : 'Mined'}
                       </span>
                     )}
                   </div>
@@ -258,7 +259,7 @@ export function RaidsScreen() {
                   disabled={!canPlant}
                 >
                   {canPlant
-                    ? (language === 'ru' ? '💣 Заложить' : '💣 Plant')
+                    ? <><Icon name="bomb" size={16} /> {language === 'ru' ? 'Заложить' : 'Plant'}</>
                     : (language === 'ru' ? '—' : '—')}
                 </button>
               </div>
@@ -268,16 +269,16 @@ export function RaidsScreen() {
 
         {/* Defuse info */}
         <div className={styles.bochkaDefuseInfo}>
-          <h4>{language === 'ru' ? '🔧 Обезвреживание' : '🔧 Defusing'}</h4>
+          <h4>{language === 'ru' ? 'Обезвреживание' : 'Defusing'}</h4>
           <div className={styles.defuseRow}>
-            <span>🪨 {language === 'ru' ? 'Огниво' : 'Flint'}</span>
+            <span><Icon name="flint" size={16} /> {language === 'ru' ? 'Огниво' : 'Flint'}</span>
             <span className={styles.defuseChance}>33%</span>
-            <span className={styles.defuseCost}>5,000🪙</span>
+            <span className={styles.defuseCost}>5,000 <Icon name="silver" size={14} /></span>
           </div>
           <div className={styles.defuseRow}>
-            <span>🔮 {language === 'ru' ? 'Мастер' : 'Master'}</span>
+            <span><Icon name="master_defuse" size={16} /> {language === 'ru' ? 'Мастер' : 'Master'}</span>
             <span className={styles.defuseChance}>75%</span>
-            <span className={styles.defuseCost}>50⭐</span>
+            <span className={styles.defuseCost}>50 <Icon name="stars" size={14} /></span>
           </div>
         </div>
       </Screen>
@@ -291,7 +292,7 @@ export function RaidsScreen() {
         <h2>{language === 'ru' ? 'Набеги' : 'Raids'}</h2>
         <div className={styles.headerActions}>
           <Button variant="ghost" size="sm" onClick={() => setView('bochka')}>
-            💣
+            <Icon name="bomb" size={20} />
           </Button>
           <Button variant="ghost" size="sm" onClick={refreshTargets}>
             {language === 'ru' ? 'Обновить' : 'Refresh'}

@@ -8,6 +8,7 @@ import { useState, type ReactNode } from 'react';
 import { Screen } from '@/components/layout/Screen';
 import { useGameStore } from '@/store/gameStore';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { Icon } from '@/components/ui/Icon';
 import styles from './SeasonsScreen.module.css';
 
 type SeasonTab = 'overview' | 'leaderboard' | 'history' | 'rewards';
@@ -24,11 +25,11 @@ const MOCK_SEASON = {
 };
 
 const TIERS = [
-  { id: 'bronze', nameRu: 'Бронза', nameEn: 'Bronze', minPoints: 0, emoji: '🥉', rewardRu: '500 серебра', rewardEn: '500 silver' },
-  { id: 'silver', nameRu: 'Серебро', nameEn: 'Silver', minPoints: 1000, emoji: '🥈', rewardRu: '2000 серебра + 10 золота', rewardEn: '2000 silver + 10 gold' },
-  { id: 'gold', nameRu: 'Золото', nameEn: 'Gold', minPoints: 5000, emoji: '🥇', rewardRu: '5000 серебра + 50 золота', rewardEn: '5000 silver + 50 gold' },
-  { id: 'diamond', nameRu: 'Алмаз', nameEn: 'Diamond', minPoints: 15000, emoji: '💎', rewardRu: '15000 серебра + 200 золота + 25⭐', rewardEn: '15000 silver + 200 gold + 25⭐' },
-  { id: 'legend', nameRu: 'Легенда', nameEn: 'Legend', minPoints: 50000, emoji: '👑', rewardRu: '50000 серебра + 500 золота + 100⭐ + титул', rewardEn: '50000 silver + 500 gold + 100⭐ + title' },
+  { id: 'bronze', nameRu: 'Бронза', nameEn: 'Bronze', minPoints: 0, color: '#CD7F32', rewardRu: '500 серебра', rewardEn: '500 silver' },
+  { id: 'silver', nameRu: 'Серебро', nameEn: 'Silver', minPoints: 1000, color: '#C0C0C0', rewardRu: '2000 серебра + 10 золота', rewardEn: '2000 silver + 10 gold' },
+  { id: 'gold', nameRu: 'Золото', nameEn: 'Gold', minPoints: 5000, color: '#FFD700', rewardRu: '5000 серебра + 50 золота', rewardEn: '5000 silver + 50 gold' },
+  { id: 'diamond', nameRu: 'Алмаз', nameEn: 'Diamond', minPoints: 15000, color: '#B9F2FF', rewardRu: '15000 серебра + 200 золота + 25 stars', rewardEn: '15000 silver + 200 gold + 25 stars' },
+  { id: 'legend', nameRu: 'Легенда', nameEn: 'Legend', minPoints: 50000, color: '#FF6B6B', rewardRu: '50000 серебра + 500 золота + 100 stars + титул', rewardEn: '50000 silver + 500 gold + 100 stars + title' },
 ];
 
 const MOCK_LEADERBOARD = [
@@ -49,22 +50,13 @@ const MOCK_HISTORY = [
   { season: 1, nameRu: 'Сезон I — Основание', nameEn: 'Season I — Foundation', rank: 134, points: 650, tier: 'bronze' },
 ];
 
-const POINT_SOURCES_RU = [
-  '💰 Сбор дохода: 1 очко за каждые 100 серебра',
-  '🏗️ Улучшение здания: 5-50 очков (зависит от уровня)',
-  '⚔️ Победа в PvP: 10-30 очков',
-  '🕳️ Пещера: 5 очков за уровень',
-  '⛓️ Захват холопа: 20 очков',
-  '🏆 Достижения: 10-100 очков',
-];
-
-const POINT_SOURCES_EN = [
-  '💰 Income collection: 1 point per 100 silver',
-  '🏗️ Building upgrade: 5-50 points (depends on level)',
-  '⚔️ PvP victory: 10-30 points',
-  '🕳️ Cave: 5 points per level',
-  '⛓️ Serf capture: 20 points',
-  '🏆 Achievements: 10-100 points',
+const POINT_SOURCES: { icon: string; textRu: string; textEn: string }[] = [
+  { icon: 'silver', textRu: 'Сбор дохода: 1 очко за каждые 100 серебра', textEn: 'Income collection: 1 point per 100 silver' },
+  { icon: 'build', textRu: 'Улучшение здания: 5-50 очков (зависит от уровня)', textEn: 'Building upgrade: 5-50 points (depends on level)' },
+  { icon: 'raids', textRu: 'Победа в PvP: 10-30 очков', textEn: 'PvP victory: 10-30 points' },
+  { icon: 'caves', textRu: 'Пещера: 5 очков за уровень', textEn: 'Cave: 5 points per level' },
+  { icon: 'serfs', textRu: 'Захват холопа: 20 очков', textEn: 'Serf capture: 20 points' },
+  { icon: 'achievements', textRu: 'Достижения: 10-100 очков', textEn: 'Achievements: 10-100 points' },
 ];
 
 export function SeasonsScreen({ header }: { header?: ReactNode } = {}) {
@@ -74,11 +66,11 @@ export function SeasonsScreen({ header }: { header?: ReactNode } = {}) {
   const currentTierIdx = TIERS.findIndex(t => t.id === MOCK_SEASON.tier);
   const nextTier = TIERS[currentTierIdx + 1];
 
-  const tabs: { id: SeasonTab; emoji: string; labelRu: string; labelEn: string }[] = [
-    { id: 'overview', emoji: '📊', labelRu: 'Обзор', labelEn: 'Overview' },
-    { id: 'leaderboard', emoji: '🏆', labelRu: 'Рейтинг', labelEn: 'Ranking' },
-    { id: 'rewards', emoji: '🎁', labelRu: 'Награды', labelEn: 'Rewards' },
-    { id: 'history', emoji: '📜', labelRu: 'История', labelEn: 'History' },
+  const tabs: { id: SeasonTab; icon: string | null; labelRu: string; labelEn: string }[] = [
+    { id: 'overview', icon: null, labelRu: 'Обзор', labelEn: 'Overview' },
+    { id: 'leaderboard', icon: 'leaderboard', labelRu: 'Рейтинг', labelEn: 'Ranking' },
+    { id: 'rewards', icon: 'daily', labelRu: 'Награды', labelEn: 'Rewards' },
+    { id: 'history', icon: null, labelRu: 'История', labelEn: 'History' },
   ];
 
   return (
@@ -86,7 +78,7 @@ export function SeasonsScreen({ header }: { header?: ReactNode } = {}) {
       {/* Season Header */}
       <div className={styles.header}>
         <h2 className={styles.screenTitle}>
-          🏆 {language === 'ru' ? MOCK_SEASON.nameRu : MOCK_SEASON.nameEn}
+          <Icon name="leaderboard" size={20} /> {language === 'ru' ? MOCK_SEASON.nameRu : MOCK_SEASON.nameEn}
         </h2>
         <span className={styles.daysLeft}>
           {language === 'ru' ? `${MOCK_SEASON.daysLeft} дней осталось` : `${MOCK_SEASON.daysLeft} days left`}
@@ -107,7 +99,7 @@ export function SeasonsScreen({ header }: { header?: ReactNode } = {}) {
             className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
             onClick={() => setActiveTab(tab.id)}
           >
-            <span>{tab.emoji}</span>
+            {tab.icon && <Icon name={tab.icon} size={16} />}
             <span className={styles.tabLabel}>{language === 'ru' ? tab.labelRu : tab.labelEn}</span>
           </button>
         ))}
@@ -122,8 +114,8 @@ export function SeasonsScreen({ header }: { header?: ReactNode } = {}) {
           </div>
 
           <div className={styles.tierInfo}>
-            <span className={styles.tierBadge}>
-              {TIERS[currentTierIdx].emoji} {language === 'ru' ? TIERS[currentTierIdx].nameRu : TIERS[currentTierIdx].nameEn}
+            <span className={styles.tierBadge} style={{ color: TIERS[currentTierIdx].color }}>
+              {language === 'ru' ? TIERS[currentTierIdx].nameRu : TIERS[currentTierIdx].nameEn}
             </span>
             <span className={styles.rankBadge}>
               #{MOCK_SEASON.playerRank}
@@ -146,8 +138,10 @@ export function SeasonsScreen({ header }: { header?: ReactNode } = {}) {
             <h4 className={styles.sourcesTitle}>
               {language === 'ru' ? 'Как получать очки:' : 'How to earn points:'}
             </h4>
-            {(language === 'ru' ? POINT_SOURCES_RU : POINT_SOURCES_EN).map((src, i) => (
-              <p key={i} className={styles.sourceItem}>{src}</p>
+            {POINT_SOURCES.map((src, i) => (
+              <p key={i} className={styles.sourceItem}>
+                <Icon name={src.icon} size={14} /> {language === 'ru' ? src.textRu : src.textEn}
+              </p>
             ))}
           </div>
         </div>
@@ -162,11 +156,11 @@ export function SeasonsScreen({ header }: { header?: ReactNode } = {}) {
               return (
                 <div key={player.rank} className={styles.leaderRow}>
                   <span className={styles.leaderRank}>
-                    {player.rank <= 3 ? ['🥇', '🥈', '🥉'][player.rank - 1] : `#${player.rank}`}
+                    #{player.rank}
                   </span>
                   <div className={styles.leaderInfo}>
                     <span className={styles.leaderName}>@{player.username}</span>
-                    <span className={styles.leaderTier}>{tierDef?.emoji} {language === 'ru' ? tierDef?.nameRu : tierDef?.nameEn}</span>
+                    <span className={styles.leaderTier} style={{ color: tierDef?.color }}>{language === 'ru' ? tierDef?.nameRu : tierDef?.nameEn}</span>
                   </div>
                   <span className={styles.leaderPoints}>{player.points.toLocaleString()}</span>
                 </div>
@@ -188,7 +182,9 @@ export function SeasonsScreen({ header }: { header?: ReactNode } = {}) {
               const isAchieved = MOCK_SEASON.playerPoints >= tier.minPoints;
               return (
                 <div key={tier.id} className={`${styles.tierRow} ${isAchieved ? styles.tierAchieved : ''}`}>
-                  <span className={styles.tierEmoji}>{tier.emoji}</span>
+                  <span className={styles.tierEmoji} style={{ color: tier.color, fontWeight: 700 }}>
+                    {language === 'ru' ? tier.nameRu.charAt(0) : tier.nameEn.charAt(0)}
+                  </span>
                   <div className={styles.tierDetails}>
                     <span className={styles.tierName}>
                       {language === 'ru' ? tier.nameRu : tier.nameEn}
@@ -200,7 +196,7 @@ export function SeasonsScreen({ header }: { header?: ReactNode } = {}) {
                       {language === 'ru' ? tier.rewardRu : tier.rewardEn}
                     </span>
                   </div>
-                  {isAchieved && <span className={styles.tierCheck}>✅</span>}
+                  {isAchieved && <span className={styles.tierCheck} style={{ color: '#4CAF50' }}>●</span>}
                 </div>
               );
             })}
@@ -223,7 +219,7 @@ export function SeasonsScreen({ header }: { header?: ReactNode } = {}) {
                     <div className={styles.historyInfo}>
                       <span className={styles.historyName}>{language === 'ru' ? h.nameRu : h.nameEn}</span>
                       <span className={styles.historyMeta}>
-                        #{h.rank} • {h.points.toLocaleString()} {language === 'ru' ? 'очков' : 'pts'} • {tierDef?.emoji} {language === 'ru' ? tierDef?.nameRu : tierDef?.nameEn}
+                        #{h.rank} • {h.points.toLocaleString()} {language === 'ru' ? 'очков' : 'pts'} • <span style={{ color: tierDef?.color }}>{language === 'ru' ? tierDef?.nameRu : tierDef?.nameEn}</span>
                       </span>
                     </div>
                   </div>

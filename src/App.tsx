@@ -4,6 +4,7 @@ import { TopBar } from '@/components/layout/TopBar';
 import { ToastContainer } from '@/components/ui/Toast';
 import { useGameLoop } from '@/hooks/useGameLoop';
 import { useGameStore } from '@/store/gameStore';
+import { BackHeader } from '@/components/ui/BackHeader';
 
 // Lazy screen imports
 import { TerritoryScreen } from '@/screens/territory/TerritoryScreen';
@@ -12,6 +13,11 @@ import { CavesScreen } from '@/screens/caves/CavesScreen';
 import { ShopScreen } from '@/screens/shop/ShopScreen';
 import { ProfileScreen } from '@/screens/profile/ProfileScreen';
 import { SerfScreen } from '@/screens/serfs/SerfScreen';
+
+// Overlay screens (accessible from AvatarDrawer)
+import { SettingsScreen } from '@/screens/settings/SettingsScreen';
+import { HelpScreen } from '@/screens/help/HelpScreen';
+import { ReferralsScreen } from '@/screens/referrals/ReferralsScreen';
 
 function ScreenRouter() {
   const activeTab = useGameStore((s) => s.activeTab);
@@ -31,6 +37,49 @@ function ScreenRouter() {
       return <ProfileScreen />;
     default:
       return <TerritoryScreen />;
+  }
+}
+
+/**
+ * Overlay screens — rendered on top of current tab, opened from AvatarDrawer.
+ * Back button returns to previous tab (doesn't switch tabs).
+ */
+function OverlayRouter() {
+  const overlayScreen = useGameStore((s) => s.overlayScreen);
+  const setOverlayScreen = useGameStore((s) => s.setOverlayScreen);
+  const language = useGameStore((s) => s.user.language);
+
+  if (!overlayScreen) return null;
+
+  const goBack = () => setOverlayScreen(null);
+
+  switch (overlayScreen) {
+    case 'profile':
+      return (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 900, background: 'var(--bg-primary)' }}>
+          <ProfileScreen initialSubScreen="profile" onOverlayBack={goBack} />
+        </div>
+      );
+    case 'settings':
+      return (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 900, background: 'var(--bg-primary)' }}>
+          <SettingsScreen header={<BackHeader onBack={goBack} titleRu="Настройки" titleEn="Settings" language={language} />} />
+        </div>
+      );
+    case 'help':
+      return (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 900, background: 'var(--bg-primary)' }}>
+          <HelpScreen header={<BackHeader onBack={goBack} titleRu="Помощь" titleEn="Help" language={language} />} />
+        </div>
+      );
+    case 'referrals':
+      return (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 900, background: 'var(--bg-primary)' }}>
+          <ReferralsScreen header={<BackHeader onBack={goBack} titleRu="Рефералы" titleEn="Referrals" language={language} />} />
+        </div>
+      );
+    default:
+      return null;
   }
 }
 
@@ -96,6 +145,7 @@ export function App() {
       <TopBar />
       <ScreenRouter />
       <TabBar />
+      <OverlayRouter />
       <ToastContainer />
     </>
   );

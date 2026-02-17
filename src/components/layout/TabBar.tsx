@@ -10,7 +10,7 @@ const TABS: { id: TabId; labelRu: string; labelEn: string; icon: string }[] = [
   { id: 'raids', labelRu: 'Набеги', labelEn: 'Raids', icon: 'ui_main/ui_nabegi' },
   { id: 'caves', labelRu: 'Пещеры', labelEn: 'Caves', icon: 'ui_main/ui_caves' },
   { id: 'shop', labelRu: 'Лавка', labelEn: 'Shop', icon: 'ui_main/ui_shop' },
-  { id: 'profile', labelRu: 'Ещё', labelEn: 'More', icon: 'ui_misc/ui_profile' },
+  { id: 'profile', labelRu: 'Двор', labelEn: 'Court', icon: 'ui_misc/ui_profile' },
 ];
 
 export function TabBar() {

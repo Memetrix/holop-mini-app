@@ -8,18 +8,19 @@ import { useState, type ReactNode } from 'react';
 import { Screen } from '@/components/layout/Screen';
 import { useGameStore } from '@/store/gameStore';
 import { formatNumber } from '@/hooks/useFormatNumber';
+import { Icon } from '@/components/ui/Icon';
 import styles from './LeaderboardScreen.module.css';
 
 type LeaderboardTab = 'income' | 'serfs' | 'battles' | 'clans' | 'diggers' | 'reputation' | 'season';
 
-const TABS: { id: LeaderboardTab; labelRu: string; labelEn: string; emoji: string }[] = [
-  { id: 'income', emoji: '💰', labelRu: 'Доход', labelEn: 'Income' },
-  { id: 'serfs', emoji: '⛓️', labelRu: 'Холопы', labelEn: 'Serfs' },
-  { id: 'battles', emoji: '⚔️', labelRu: 'Бои', labelEn: 'Battles' },
-  { id: 'clans', emoji: '👑', labelRu: 'Княжества', labelEn: 'Kingdoms' },
-  { id: 'diggers', emoji: '⛏️', labelRu: 'Рудознатцы', labelEn: 'Miners' },
-  { id: 'reputation', emoji: '⭐', labelRu: 'Репутация', labelEn: 'Reputation' },
-  { id: 'season', emoji: '🏆', labelRu: 'Сезон', labelEn: 'Season' },
+const TABS: { id: LeaderboardTab; labelRu: string; labelEn: string; icon: string }[] = [
+  { id: 'income', icon: 'lb_income', labelRu: 'Доход', labelEn: 'Income' },
+  { id: 'serfs', icon: 'lb_serfs', labelRu: 'Холопы', labelEn: 'Serfs' },
+  { id: 'battles', icon: 'lb_battles', labelRu: 'Бои', labelEn: 'Battles' },
+  { id: 'clans', icon: 'lb_clans', labelRu: 'Княжества', labelEn: 'Kingdoms' },
+  { id: 'diggers', icon: 'lb_diggers', labelRu: 'Рудознатцы', labelEn: 'Miners' },
+  { id: 'reputation', icon: 'lb_reputation', labelRu: 'Репутация', labelEn: 'Reputation' },
+  { id: 'season', icon: 'lb_season', labelRu: 'Сезон', labelEn: 'Season' },
 ];
 
 // Mock leaderboard data
@@ -49,9 +50,9 @@ function getValueLabel(tab: LeaderboardTab, language: 'ru' | 'en'): string {
 }
 
 function getRankMedal(rank: number): string {
-  if (rank === 1) return '🥇';
-  if (rank === 2) return '🥈';
-  if (rank === 3) return '🥉';
+  if (rank === 1) return '#1';
+  if (rank === 2) return '#2';
+  if (rank === 3) return '#3';
   return `#${rank}`;
 }
 
@@ -66,7 +67,7 @@ export function LeaderboardScreen({ header }: { header?: ReactNode } = {}) {
     <Screen header={header}>
       <div className={styles.header}>
         <h2 className={styles.screenTitle}>
-          {language === 'ru' ? '🏆 Рейтинги' : '🏆 Rankings'}
+          <Icon name="leaderboard" size={20} /> {language === 'ru' ? 'Рейтинги' : 'Rankings'}
         </h2>
       </div>
 
@@ -78,7 +79,7 @@ export function LeaderboardScreen({ header }: { header?: ReactNode } = {}) {
             className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
             onClick={() => setActiveTab(tab.id)}
           >
-            <span>{tab.emoji}</span>
+            <Icon name={tab.icon} size={16} />
             <span className={styles.tabLabel}>{language === 'ru' ? tab.labelRu : tab.labelEn}</span>
           </button>
         ))}
@@ -87,7 +88,7 @@ export function LeaderboardScreen({ header }: { header?: ReactNode } = {}) {
       {/* Leaderboard List */}
       <div className={styles.listCard}>
         <h3 className={styles.listTitle}>
-          {currentTabDef.emoji} {language === 'ru' ? currentTabDef.labelRu : currentTabDef.labelEn}
+          <Icon name={currentTabDef.icon} size={18} /> {language === 'ru' ? currentTabDef.labelRu : currentTabDef.labelEn}
         </h3>
 
         <div className={styles.list}>

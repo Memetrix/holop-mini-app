@@ -9,6 +9,7 @@ import { Screen } from '@/components/layout/Screen';
 import { useGameStore } from '@/store/gameStore';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
 import { Button } from '@/components/ui/Button';
+import { Icon } from '@/components/ui/Icon';
 import { useHaptics } from '@/hooks/useHaptics';
 import { formatNumber } from '@/hooks/useFormatNumber';
 import { GAME } from '@/config/constants';
@@ -99,7 +100,7 @@ export function BankScreen({ header }: { header?: ReactNode } = {}) {
     return (
       <Screen header={header}>
         <div className={styles.lockedCard}>
-          <div className={styles.lockedIcon}>🏦</div>
+          <div className={styles.lockedIcon}><Icon name="bank" size={48} /></div>
           <h2 className={styles.lockedTitle}>
             {language === 'ru' ? 'Казна' : 'Treasury'}
           </h2>
@@ -122,8 +123,8 @@ export function BankScreen({ header }: { header?: ReactNode } = {}) {
           {user.stars < GAME.BANK_UNLOCK_COST_STARS && (
             <p className={styles.insufficientText}>
               {language === 'ru'
-                ? `Не хватает ${GAME.BANK_UNLOCK_COST_STARS - user.stars} ⭐`
-                : `Need ${GAME.BANK_UNLOCK_COST_STARS - user.stars} more ⭐`}
+                ? `Не хватает ${GAME.BANK_UNLOCK_COST_STARS - user.stars} звёзд`
+                : `Need ${GAME.BANK_UNLOCK_COST_STARS - user.stars} more stars`}
             </p>
           )}
         </div>
@@ -137,7 +138,7 @@ export function BankScreen({ header }: { header?: ReactNode } = {}) {
       {/* Header */}
       <div className={styles.header}>
         <h2 className={styles.screenTitle}>
-          {language === 'ru' ? '🏦 Казна' : '🏦 Treasury'}
+          <Icon name="bank" size={20} /> {language === 'ru' ? 'Казна' : 'Treasury'}
         </h2>
         <p className={styles.subtitle}>
           {language === 'ru'
@@ -184,7 +185,7 @@ export function BankScreen({ header }: { header?: ReactNode } = {}) {
           fullWidth
           onClick={() => setShowDeposit(!showDeposit)}
         >
-          {language === 'ru' ? '📥 Вложить' : '📥 Deposit'}
+          {language === 'ru' ? 'Вложить' : 'Deposit'}
         </Button>
         <Button
           variant="secondary"
@@ -192,7 +193,7 @@ export function BankScreen({ header }: { header?: ReactNode } = {}) {
           onClick={handleWithdraw}
           disabled={bank.depositedSilver <= 0}
         >
-          {language === 'ru' ? '📤 Снять всё' : '📤 Withdraw All'}
+          {language === 'ru' ? 'Снять всё' : 'Withdraw All'}
         </Button>
       </div>
 

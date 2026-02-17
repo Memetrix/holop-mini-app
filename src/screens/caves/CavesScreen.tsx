@@ -8,6 +8,7 @@ import { CAVE_BOOSTERS } from '@/config/weapons';
 import { GAME } from '@/config/constants';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
 import { Button } from '@/components/ui/Button';
+import { Icon } from '@/components/ui/Icon';
 import { LootboxScene } from '@/pixi/LootboxScene';
 import type { LootReward } from '@/pixi/LootboxScene';
 import styles from './CavesScreen.module.css';
@@ -151,7 +152,7 @@ export function CavesScreen() {
                   {isActive && <span style={{ color: '#4CAF50', fontSize: 11 }}>{language === 'ru' ? 'Активен' : 'Active'}</span>}
                   {qty === 0 && !isActive && (
                     <Button variant="ghost" size="sm" onClick={() => handleBuyBooster(b.id)} style={{ fontSize: 11, padding: '2px 8px' }}>
-                      {b.cost} ⭐
+                      {b.cost} <Icon name="stars" size={14} />
                     </Button>
                   )}
                 </div>
@@ -249,7 +250,7 @@ export function CavesScreen() {
           </p>
           <div style={{ display: 'flex', gap: 12, flexDirection: 'column', width: '100%', maxWidth: 280 }}>
             <Button variant="primary" size="lg" fullWidth onClick={handleResurrect}>
-              {language === 'ru' ? 'Воскреситься' : 'Resurrect'} ({GAME.CAVE_RESURRECTION_BASE_STARS + GAME.CAVE_RESURRECTION_PER_LEVEL_STARS * defeatMonsterLevel} ⭐)
+              {language === 'ru' ? 'Воскреситься' : 'Resurrect'} ({GAME.CAVE_RESURRECTION_BASE_STARS + GAME.CAVE_RESURRECTION_PER_LEVEL_STARS * defeatMonsterLevel} <Icon name="stars" size={14} />)
             </Button>
             <Button variant="ghost" size="md" fullWidth onClick={() => setDefeatMonsterLevel(null)}>
               {language === 'ru' ? 'Вернуться' : 'Go Back'}

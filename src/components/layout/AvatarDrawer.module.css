@@ -1,0 +1,227 @@
+/* ─── Overlay ─── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-overlay, 1000);
+  animation: fadeIn 200ms ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ─── Drawer Panel (slides from left) ─── */
+.drawer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 85%;
+  max-width: 340px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(24px) saturate(var(--glass-saturate));
+  border-right: 1px solid var(--glass-border);
+  padding: env(safe-area-inset-top, 0px) var(--space-4) var(--space-6);
+  padding-top: calc(env(safe-area-inset-top, 0px) + var(--space-6));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: slideIn 280ms cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* ─── Player Card ─── */
+.playerCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dark);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.playerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.username {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--gold-light);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titleCity {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+/* ─── Stats Row ─── */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.statLabel {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--parchment);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Progress Section ─── */
+.progressSection {
+  padding: 0 var(--space-1);
+}
+
+/* ─── Equipment ─── */
+.equipSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.equipItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+}
+
+.equipImg {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.equipName {
+  flex: 1;
+  font-size: 13px;
+  color: var(--parchment);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.equipStat {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold-light);
+  flex-shrink: 0;
+}
+
+/* ─── Navigation List ─── */
+.navList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: var(--space-2);
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-2);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 150ms;
+  width: 100%;
+  text-align: left;
+}
+
+.navItem:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.navLabel {
+  flex: 1;
+  font-size: 15px;
+  color: var(--parchment);
+}
+
+.navArrow {
+  font-size: 18px;
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+/* ─── Language Toggle ─── */
+.langToggle {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+  margin-top: auto;
+  padding: var(--space-4) 0;
+}
+
+.langBtn {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.langBtn:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.langActive {
+  background: rgba(255, 215, 0, 0.12);
+  border-color: var(--gold-dark);
+  color: var(--gold-light);
+}

@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
 import { formatNumber } from '@/hooks/useFormatNumber';
 import { DAILY_BONUS, DAILY_BONUS_CONFIG, getRestoreCost } from '@/config/dailyBonus';
 import { Button } from '@/components/ui/Button';
+import { Icon } from '@/components/ui/Icon';
 import styles from './DailyBonus.module.css';
 
 // ─── Helpers ───
@@ -18,11 +20,11 @@ function pluralDays(n: number): string {
   return `${n} дней`;
 }
 
-/** Reward icon emoji for the dominant currency of a day. */
-function rewardIcon(day: (typeof DAILY_BONUS)[number]): string {
-  if (day.stars > 0) return '\u2B50';
-  if (day.gold > 0) return '\uD83E\uDE99';
-  return '\uD83E\uDEB6'; // silver coin fallback
+/** Reward icon for the dominant currency of a day. */
+function rewardIcon(day: (typeof DAILY_BONUS)[number]): ReactNode {
+  if (day.stars > 0) return <Icon name="stars" size={14} />;
+  if (day.gold > 0) return <Icon name="gold" size={14} />;
+  return <Icon name="silver" size={14} />;
 }
 
 /** Short label for a day's primary reward. */
@@ -123,7 +125,7 @@ export function DailyBonus() {
         )}
 
         {isToday && !isTodayClaimed && streakAction === 'too_early' && (
-          <span className={styles.claimLabel}>&#8987;</span>
+          <span className={styles.claimLabel}>...</span>
         )}
 
         {isToday && !isTodayClaimed && streakAction !== 'too_early' && (
@@ -206,7 +208,7 @@ export function DailyBonus() {
             fullWidth
             onClick={handleRestore}
           >
-            Восстановить серию ({restoreCost} ⭐)
+            Восстановить серию ({restoreCost} <Icon name="stars" size={14} />)
           </Button>
           <span className={styles.restoreHint}>
             {DAILY_BONUS_CONFIG.DAILY_RESTORE_COST} звёзд за день, макс. {DAILY_BONUS_CONFIG.DAILY_RESTORE_MAX} дня

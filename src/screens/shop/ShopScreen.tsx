@@ -24,6 +24,7 @@ import { LOOTBOXES, getDropChance, RARITY_COLORS } from '@/config/lootboxes';
 import type { LootboxDef } from '@/config/lootboxes';
 import { CurrencyBadge } from '@/components/ui/CurrencyBadge';
 import { Button } from '@/components/ui/Button';
+import { Icon } from '@/components/ui/Icon';
 import { useHaptics } from '@/hooks/useHaptics';
 import type { ShopCategory } from '@/store/types';
 import styles from './ShopScreen.module.css';
@@ -33,6 +34,7 @@ interface TabDef {
   key: ShopCategory;
   labelRu: string;
   labelEn: string;
+  icon?: string;
 }
 
 const TABS: TabDef[] = [
@@ -43,7 +45,7 @@ const TABS: TabDef[] = [
   { key: 'potions', labelRu: 'Зелья', labelEn: 'Potions' },
   { key: 'explosives', labelRu: 'Взрывчатка', labelEn: 'Explosives' },
   { key: 'boosters', labelRu: 'Бустеры', labelEn: 'Boosters' },
-  { key: 'lootboxes', labelRu: '📦 Лутбоксы', labelEn: '📦 Lootboxes' },
+  { key: 'lootboxes', labelRu: 'Лутбоксы', labelEn: 'Lootboxes', icon: 'lootbox' },
 ];
 
 // ─── Helpers ───
@@ -331,6 +333,7 @@ export function ShopScreen() {
               WebkitBackdropFilter: 'blur(12px) saturate(1.6)',
             }}
           >
+            {tab.icon && <Icon name={tab.icon} size={16} style={{ verticalAlign: 'middle', marginRight: 4 }} />}
             {language === 'ru' ? tab.labelRu : tab.labelEn}
           </button>
         ))}
@@ -343,7 +346,7 @@ export function ShopScreen() {
             return (
               <div key={lb.id} className={styles.lootboxCard}>
                 <div className={styles.lootboxHeader}>
-                  <span className={styles.lootboxEmoji}>{lb.emoji}</span>
+                  <Icon name="lootbox" size={28} />
                   <div className={styles.lootboxTitle}>
                     <span className={styles.itemName}>
                       {language === 'ru' ? lb.nameRu : lb.nameEn}
@@ -414,7 +417,8 @@ export function ShopScreen() {
           {lootboxResults && (
             <div className={styles.lootboxResults}>
               <h4 className={styles.resultsTitle}>
-                {language === 'ru' ? '🎁 Выпало:' : '🎁 You got:'}
+                <Icon name="daily" size={16} />{' '}
+                {language === 'ru' ? 'Выпало:' : 'You got:'}
               </h4>
               {lootboxResults.map((drop, i) => (
                 <div key={i} className={styles.resultItem}>
